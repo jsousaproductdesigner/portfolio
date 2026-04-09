@@ -41,22 +41,18 @@ html, body {
   cursor: none;
 }
 
-/* ── Custom cursor ── */
+/* ── Ship cursor ── */
 #cursor {
-  width: 12px; height: 12px;
-  border: 2px solid var(--amber);
-  border-radius: 50%;
+  width: 48px; height: 38px;
   position: fixed; top: 0; left: 0;
   pointer-events: none;
   z-index: 9999;
-  transition: transform 0.15s ease, background 0.2s ease, width 0.2s ease, height 0.2s ease;
-  mix-blend-mode: difference;
+  transform: translate(-24px, -30px);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  transition: transform 0.08s ease;
 }
-#cursor.hover {
-  width: 36px; height: 36px;
-  background: rgba(201,125,42,0.15);
-  transform: translate(-50%,-50%) scale(1) !important;
-}
+#cursor svg { width: 100%; height: 100%; }
+#cursor.hover { transform: translate(-24px, -30px) scale(1.2); }
 
 /* ── Top Navigation ── */
 #nav {
@@ -156,7 +152,7 @@ html, body {
 /* ── Section cards on the map ── */
 .map-section {
   position: absolute;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -20px);
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.6s var(--transition);
@@ -181,18 +177,18 @@ html, body {
   border-radius: inherit;
 }
 
-/* ── Ship ── */
+/* ── Ship (map layer) ── */
 #ship {
   position: absolute;
-  width: 100px; height: 80px;
-  transform: translate(-50%, -50%);
+  width: 70px; height: 56px;
+  transform: translate(-50%, -100%);
   animation: bob 3s ease-in-out infinite;
   z-index: 10;
   transition: left 1.8s var(--transition), top 1.4s var(--transition);
 }
 @keyframes bob {
-  0%, 100% { transform: translate(-50%, -50%) rotate(-1.5deg) translateY(0); }
-  50% { transform: translate(-50%, -50%) rotate(1.5deg) translateY(-6px); }
+  0%, 100% { transform: translate(-50%, -100%) rotate(-2deg) translateY(0); }
+  50% { transform: translate(-50%, -100%) rotate(2deg) translateY(-5px); }
 }
 
 /* ── Dotted path ── */
@@ -690,24 +686,28 @@ html, body {
   transition: all 0.3s;
 }
 
-/* ── Scroll hint ── */
-#scroll-hint {
-  position: fixed; bottom: 5rem; right: 2.5rem;
-  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
-  z-index: 500; opacity: 0.5;
-  font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--parchment-dark);
-  animation: fadeInOut 3s ease-in-out 2s infinite;
+/* ── Nav arrows ── */
+.nav-arrow {
+  position: fixed; top: 50%; z-index: 600;
+  width: 56px; height: 56px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(6,12,24,0.65);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(201,125,42,0.3);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.25s;
+  transform: translateY(-50%);
 }
-#scroll-hint svg { animation: arrow-bounce 1.5s ease-in-out infinite; }
-@keyframes arrow-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(4px); }
+.nav-arrow:hover {
+  background: rgba(201,125,42,0.2);
+  border-color: rgba(201,125,42,0.7);
+  transform: translateY(-50%) scale(1.08);
 }
-@keyframes fadeInOut {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 0.15; }
-}
+.nav-arrow.disabled { opacity: 0.2; pointer-events: none; }
+#nav-prev { left: 1.25rem; }
+#nav-next { right: 1.25rem; }
+.nav-arrow svg { width: 22px; height: 22px; stroke: var(--parchment); }
 
 /* ── Wave animations (decorative) ── */
 @keyframes wave-move {
@@ -794,8 +794,19 @@ html, body {
   <div class="loader-bar"><div class="loader-bar-fill"></div></div>
 </div>
 
-<!-- Custom cursor -->
-<div id="cursor"></div>
+<!-- Ship cursor -->
+<div id="cursor">
+  <svg viewBox="0 0 48 38" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6 28 Q14 36 24 37 Q34 36 42 28 L40 25 L8 25 Z" fill="#5a3a1a" stroke="#3a2010" stroke-width="0.8"/>
+    <path d="M24 4 L24 24 L12 20 Z" fill="rgba(245,230,200,0.95)" stroke="rgba(201,125,42,0.6)" stroke-width="0.6"/>
+    <path d="M24 8 L24 24 L34 21 Z" fill="rgba(245,230,200,0.78)" stroke="rgba(201,125,42,0.5)" stroke-width="0.6"/>
+    <line x1="24" y1="2" x2="24" y2="26" stroke="#3a2010" stroke-width="1.2"/>
+    <path d="M24 2 L32 5 L24 9" fill="rgba(155,45,32,0.9)"/>
+    <circle cx="17" cy="29" r="2" fill="rgba(255,200,80,0.5)" stroke="#3a2010" stroke-width="0.4"/>
+    <circle cx="31" cy="29" r="2" fill="rgba(255,200,80,0.5)" stroke="#3a2010" stroke-width="0.4"/>
+    <path d="M8 34 Q16 36 24 35 Q32 36 40 34" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" fill="none" stroke-dasharray="3 2"/>
+  </svg>
+</div>
 
 <!-- Navigation -->
 <nav id="nav">
@@ -839,37 +850,8 @@ html, body {
       stroke="rgba(201,125,42,0.4)" stroke-width="2" stroke-dasharray="12 10" fill="none"
       stroke-linecap="round"/>
 
-    <!-- Island 1: home (large) -->
-    <ellipse cx="700" cy="920" rx="260" ry="180" fill="#1a3a1f" opacity="0.9"/>
-    <ellipse cx="700" cy="910" rx="220" ry="150" fill="#2d5a3d" opacity="0.8"/>
-    <ellipse cx="700" cy="900" rx="170" ry="110" fill="#3a7048" opacity="0.7"/>
-    <!-- beach -->
-    <ellipse cx="700" cy="970" rx="200" ry="50" fill="#8a7540" opacity="0.4"/>
-
-    <!-- Island 2: about -->
-    <ellipse cx="1400" cy="820" rx="200" ry="140" fill="#1a3a1f" opacity="0.9"/>
-    <ellipse cx="1400" cy="810" rx="160" ry="110" fill="#2d5a3d" opacity="0.8"/>
-    <ellipse cx="1400" cy="800" rx="120" ry="80" fill="#3a7048" opacity="0.7"/>
-    <ellipse cx="1400" cy="860" rx="150" ry="40" fill="#8a7540" opacity="0.4"/>
-
-    <!-- Island 3: case 1 (VOLL) -->
-    <ellipse cx="2600" cy="870" rx="280" ry="180" fill="#1a3a1f" opacity="0.9"/>
-    <ellipse cx="2600" cy="858" rx="240" ry="150" fill="#2d5a3d" opacity="0.8"/>
-    <ellipse cx="2600" cy="845" rx="190" ry="115" fill="#3a7048" opacity="0.7"/>
-    <ellipse cx="2600" cy="930" rx="230" ry="55" fill="#8a7540" opacity="0.4"/>
-
-    <!-- Island 4: future case (placeholder) -->
-    <ellipse cx="3600" cy="860" rx="210" ry="140" fill="#1a3a1f" opacity="0.7"/>
-    <ellipse cx="3600" cy="848" rx="170" ry="110" fill="#2d5a3d" opacity="0.6"/>
-    <ellipse cx="3600" cy="836" rx="130" ry="80" fill="#3a7048" opacity="0.5"/>
-    <!-- Skull on this island -->
-    <text x="3600" y="850" text-anchor="middle" font-size="32" opacity="0.5" fill="var(--parchment)">☠</text>
-
-    <!-- Island 5: contact (X island) -->
-    <ellipse cx="4500" cy="840" rx="240" ry="155" fill="#3a1f1f" opacity="0.9"/>
-    <ellipse cx="4500" cy="828" rx="195" ry="120" fill="#5a2d2d" opacity="0.8"/>
-    <ellipse cx="4500" cy="815" rx="150" ry="90" fill="#7a3d3d" opacity="0.7"/>
-    <ellipse cx="4500" cy="890" rx="185" ry="45" fill="#8a6040" opacity="0.4"/>
+    <!-- Skull on terra incognita -->
+    <text x="3600" y="928" text-anchor="middle" font-size="20" opacity="0.45" fill="#f5e6c8">☠</text>
 
     <!-- Decorative sea monsters / details -->
     <text x="1000" y="1200" font-size="48" opacity="0.12" fill="var(--parchment)">🐋</text>
@@ -916,8 +898,8 @@ html, body {
     <text x="4500" y="690" text-anchor="middle" font-family="'IM Fell English',serif" font-size="13" fill="rgba(245,230,200,0.5)" font-style="italic">Ilha do Tesouro</text>
   </svg>
 
-  <!-- Animated Ship -->
-  <div id="ship" style="left:700px; top:820px;">
+  <!-- Animated Ship (map layer, follows active section) -->
+  <div id="ship" style="left:700px; top:895px; width:70px; height:56px;">
     <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
       <!-- Hull -->
       <path d="M10 55 Q20 70 50 72 Q80 70 90 55 L85 50 L15 50 Z" fill="#5a3a1a" stroke="#3a2010" stroke-width="1"/>
@@ -938,7 +920,7 @@ html, body {
   </div>
 
   <!-- ══════════ SECTION 0: HOME ══════════ -->
-  <div class="map-section visible" id="home-section" style="left:700px; top:900px;">
+  <div class="map-section visible" id="home-section" style="left:700px; top:970px;">
     <div class="panel" id="home-card">
       <div class="home-eyebrow" data-en="Product Designer · São Paulo, Brazil" data-pt="Product Designer · São Paulo, Brasil">
         Product Designer · São Paulo, Brazil
@@ -971,7 +953,7 @@ html, body {
   </div>
 
   <!-- ══════════ SECTION 1: ABOUT ══════════ -->
-  <div class="map-section" id="about-section" style="left:1400px; top:800px;">
+  <div class="map-section" id="about-section" style="left:1400px; top:870px;">
     <div class="panel" id="about-card">
       <div class="section-label" data-en="Navigator's log" data-pt="Diário de bordo">Navigator's log</div>
       <h2 class="section-title" data-en="Who am I" data-pt="Quem sou eu">Who am I</h2>
@@ -1019,7 +1001,7 @@ html, body {
   </div>
 
   <!-- ══════════ SECTION 2: VOLL FLIGHTS CASE ══════════ -->
-  <div class="map-section" id="case1-section" style="left:2600px; top:860px;">
+  <div class="map-section" id="case1-section" style="left:2600px; top:975px;">
     <div class="panel case-card">
       <div class="case-header">
         <div class="case-meta">
@@ -1074,7 +1056,7 @@ html, body {
   </div>
 
   <!-- ══════════ SECTION 3: FUTURE CASE (placeholder) ══════════ -->
-  <div class="map-section" id="case2-section" style="left:3600px; top:840px;">
+  <div class="map-section" id="case2-section" style="left:3600px; top:945px;">
     <div class="panel" style="width:480px; padding:3rem; text-align:center;">
       <div class="section-label" data-en="Coming soon" data-pt="Em breve">Coming soon</div>
       <h2 class="section-title" style="font-size:2rem;" data-en="Next case study" data-pt="Próximo case">Next case study</h2>
@@ -1087,7 +1069,7 @@ html, body {
   </div>
 
   <!-- ══════════ SECTION 4: CONTACT ══════════ -->
-  <div class="map-section" id="contact-section" style="left:4500px; top:830px;">
+  <div class="map-section" id="contact-section" style="left:4500px; top:950px;">
     <div class="panel" id="contact-card">
       <span class="x-mark">✕</span>
       <h2 class="contact-title" data-en="Let's talk" data-pt="Vamos conversar">Let's talk</h2>
@@ -1140,7 +1122,7 @@ html, body {
         <div class="modal-meta-row">
           <div class="modal-meta-item">
             <div class="label" data-en="Role" data-pt="Papel">Role</div>
-            <div class="value" data-en="Product Designer" data-pt="Product Designer">Product Designer</div>
+            <div class="value">Product Designer</div>
           </div>
           <div class="modal-meta-item">
             <div class="label" data-en="Timeline" data-pt="Duração">Timeline</div>
@@ -1157,86 +1139,118 @@ html, body {
         </div>
       </div>
 
-      <img src="assets/cover.png" class="modal-img" alt="VOLL Flights cover" onerror="this.style.display='none'">
+      <!-- Cover -->
+      <img src="assets/cover.png" class="modal-img" alt="VOLL Flights cover">
 
+      <!-- Section 01: Context -->
       <div class="modal-section">
-        <div class="modal-section-label" data-en="Context" data-pt="Contexto">Context</div>
+        <div class="modal-section-label">Context</div>
         <h2 class="modal-section-title" data-en="Corporate travel, real friction" data-pt="Viagem corporativa, atrito real">Corporate travel, real friction</h2>
-        <p class="modal-body" data-en="VOLL is a corporate travel management platform serving companies across Brazil. After nearly 2 years since launching the air ticket booking product, significant user feedback and operational data revealed critical problems that were costing the business — and frustrating users." data-pt="VOLL é uma plataforma de gestão de viagens corporativas que atende empresas no Brasil. Após quase 2 anos desde o lançamento do produto de reserva de passagens aéreas, feedbacks de usuários e dados operacionais revelaram problemas críticos que custavam ao negócio — e frustravam os usuários.">
-          VOLL is a corporate travel management platform serving companies across Brazil. After nearly 2 years since launching the air ticket booking product, significant user feedback and operational data revealed critical problems that were costing the business — and frustrating users.
+        <p class="modal-body" data-en="VOLL is a corporate travel platform serving companies across Brazil. After nearly 2 years since launching the air ticket product, feedback and operational data revealed critical usability problems costing the business." data-pt="VOLL é uma plataforma de viagens corporativas. Após quase 2 anos do produto de passagens aéreas, feedbacks e dados revelaram problemas críticos de usabilidade que custavam ao negócio.">
+          VOLL is a corporate travel platform serving companies across Brazil. After nearly 2 years since launching the air ticket product, feedback and operational data revealed critical usability problems costing the business.
         </p>
-        <img src="assets/02_Section.png" class="modal-img" alt="Context" onerror="this.style.display='none'">
+        <img src="assets/01_Section.png" class="modal-img" alt="Context">
       </div>
 
+      <!-- Section 02: Context detail -->
+      <img src="assets/02_Section.png" class="modal-img" alt="Context detail">
+
+      <!-- Section 04: Challenge & Goals -->
       <div class="modal-section">
-        <div class="modal-section-label" data-en="The problem" data-pt="O problema">The problem</div>
-        <h2 class="modal-section-title" data-en="At least 15% chose the phone over the app" data-pt="Pelo menos 15% preferiram o telefone ao app">At least 15% chose the phone over the app</h2>
-        <p class="modal-body" data-en="The experience generated enough confusion that at least 15% of users abandoned making reservations through the platform and resorted to offline support. Three core issues drove this:" data-pt="A experiência gerava confusão suficiente para que pelo menos 15% dos usuários abandonassem as reservas pela plataforma e recorressem ao suporte offline. Três problemas centrais causavam isso:">
-          The experience generated enough confusion that at least 15% of users abandoned making reservations through the platform and resorted to offline support. Three core issues drove this:
-        </p>
+        <div class="modal-section-label" data-en="Challenge & Goals" data-pt="Desafio & Objetivos">Challenge & Goals</div>
+        <h2 class="modal-section-title" data-en="Three pillars to redesign" data-pt="Três pilares do redesign">Three pillars to redesign</h2>
         <div class="challenge-cards">
           <div class="challenge-card">
-            <h4 data-en="Cognitive overload" data-pt="Sobrecarga cognitiva">Cognitive overload</h4>
-            <p data-en="Confusion selecting outbound, return, and combined flights. Users didn't know the total cost before completing the booking." data-pt="Confusão ao selecionar voos de ida, volta e combinados. Usuários não sabiam o custo total antes de finalizar a reserva.">Confusion selecting outbound, return, and combined flights. Users didn't know the total cost before completing the booking.</p>
+            <h4 data-en="Less friction" data-pt="Menos atrito">Less friction</h4>
+            <p data-en="Users selecting flights without knowing the total cost until the end of the flow." data-pt="Usuários selecionando voos sem saber o custo total até o fim do fluxo.">Users selecting flights without knowing the total cost until the end of the flow.</p>
           </div>
           <div class="challenge-card">
-            <h4 data-en="Backend limitation" data-pt="Limitação de backend">Backend limitation</h4>
-            <p data-en="The system couldn't map all round-trip tickets during search, reducing available options and increasing loading time." data-pt="O sistema não conseguia mapear todas as passagens de ida e volta durante a busca, reduzindo opções e aumentando o carregamento.">The system couldn't map all round-trip tickets during search, reducing available options and increasing loading time.</p>
+            <h4 data-en="Better backend" data-pt="Backend melhorado">Better backend</h4>
+            <p data-en="System couldn't map all round-trip fares during search — reducing options and increasing load time." data-pt="O sistema não conseguia mapear todas as tarifas de ida e volta durante a busca.">System couldn't map all round-trip fares during search — reducing options and increasing load time.</p>
           </div>
           <div class="challenge-card">
-            <h4 data-en="Language mismatch" data-pt="Linguagem inadequada">Language mismatch</h4>
-            <p data-en="Technical terminology didn't match how users talked about flights. Visual hierarchy was overloaded with excessive elements." data-pt="Terminologia técnica não correspondia à linguagem dos usuários. A hierarquia visual estava sobrecarregada com elementos excessivos.">Technical terminology didn't match how users talked about flights. Visual hierarchy was overloaded with excessive elements.</p>
+            <h4 data-en="Market alignment" data-pt="Alinhamento de mercado">Market alignment</h4>
+            <p data-en="Language and interface didn't match modern airline booking tools users were already accustomed to." data-pt="A linguagem e interface não correspondiam às ferramentas de reserva modernas que os usuários já usavam.">Language and interface didn't match modern airline booking tools users were already accustomed to.</p>
           </div>
         </div>
-        <img src="assets/07_Section.png" class="modal-img" alt="User pains and business needs" onerror="this.style.display='none'">
+        <img src="assets/04_Section.png" class="modal-img" alt="Challenge and Goals">
       </div>
 
+      <!-- Section 05: Previous experience + Solution part 1 -->
       <div class="modal-section">
-        <div class="modal-section-label" data-en="Research & Discovery" data-pt="Pesquisa & Descoberta">Research & Discovery</div>
-        <h2 class="modal-section-title" data-en="Understanding the full system" data-pt="Entendendo o sistema completo">Understanding the full system</h2>
-        <p class="modal-body" data-en="I mapped the original user/system flow to understand where confusion emerged. The backend segmented outbound, return, and combined fares separately — forcing users to navigate three distinct tabs. The new ideal flow would let the backend scan all fares simultaneously, showing users a single streamlined experience." data-pt="Mapeei o fluxo original usuário/sistema para entender onde surgiam as confusões. O backend separava tarifas de ida, volta e combinadas — forçando os usuários a navegar por três abas distintas. O novo fluxo ideal permitiria ao backend escanear todas as tarifas simultaneamente, apresentando uma experiência única e simplificada.">
-          I mapped the original user/system flow to understand where confusion emerged. The backend segmented outbound, return, and combined fares separately — forcing users to navigate three distinct tabs. The new ideal flow would let the backend scan all fares simultaneously, showing users a single streamlined experience.
+        <div class="modal-section-label" data-en="Discovery" data-pt="Descoberta">Discovery</div>
+        <h2 class="modal-section-title" data-en="The previous experience" data-pt="A experiência anterior">The previous experience</h2>
+        <img src="assets/05_Section.png" class="modal-img" alt="Previous experience and solution part 1">
+      </div>
+
+      <!-- Section 06: Final design -->
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Solution" data-pt="Solução">Solution</div>
+        <h2 class="modal-section-title" data-en="Final design" data-pt="Design final">Final design</h2>
+        <img src="assets/06_Section.png" class="modal-img" alt="Final design">
+      </div>
+
+      <!-- Section 07: User pains & Business needs -->
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Research" data-pt="Pesquisa">Research</div>
+        <h2 class="modal-section-title" data-en="At least 15% chose offline support" data-pt="Pelo menos 15% escolheram o suporte offline">At least 15% chose offline support</h2>
+        <p class="modal-body" data-en="The experience generated enough confusion that at least 15% of users abandoned the platform and resorted to calling support — directly costing the business." data-pt="A experiência gerava confusão suficiente para que pelo menos 15% dos usuários abandonassem a plataforma e ligassem para o suporte — custando diretamente ao negócio.">
+          The experience generated enough confusion that at least 15% of users abandoned the platform and resorted to calling support — directly costing the business.
         </p>
-        <img src="assets/08_Section.png" class="modal-img" alt="User system flow" onerror="this.style.display='none'">
+        <img src="assets/07_Section.png" class="modal-img" alt="User pains and business needs">
       </div>
 
-      <div class="modal-section">
-        <div class="modal-section-label" data-en="Design process" data-pt="Processo de design">Design process</div>
-        <h2 class="modal-section-title" data-en="The redesign — 5 key decisions" data-pt="O redesign — 5 decisões-chave">The redesign — 5 key decisions</h2>
-        <img src="assets/05_Section.png" class="modal-img" alt="Design process part 1" onerror="this.style.display='none'">
-        <img src="assets/01_Section.png" class="modal-img" alt="Final web screens" onerror="this.style.display='none'">
-        <img src="assets/mobile_screens.png" class="modal-img" alt="Final mobile screens" onerror="this.style.display='none'">
-      </div>
-
+      <!-- Section 09: Usability tests -->
       <div class="modal-section">
         <div class="modal-section-label" data-en="Testing" data-pt="Testes">Testing</div>
         <h2 class="modal-section-title" data-en="Moderated + Maze testing" data-pt="Testes moderados + Maze">Moderated + Maze testing</h2>
-        <p class="modal-body" data-en="I ran moderated tests via Google Meets (5 participants) and async tests via Maze platform. Key findings: the date selection calendar needed simplification, and return flight selection directly below the outbound flight caused confusion for 4 out of 5 participants." data-pt="Realizei testes moderados via Google Meets (5 participantes) e testes assíncronos via Maze. Principais descobertas: o calendário de seleção de datas precisava de simplificação, e a seleção de voo de retorno diretamente abaixo do voo de ida gerou confusão em 4 de 5 participantes.">
-          I ran moderated tests via Google Meets (5 participants) and async tests via Maze platform. Key findings: the date selection calendar needed simplification, and return flight selection directly below the outbound flight caused confusion for 4 out of 5 participants.
+        <p class="modal-body" data-en="Moderated sessions via Google Meet with 5 participants, plus async tests via Maze. Tasks covered flight search, outbound selection, return selection, and fare comparison." data-pt="Sessões moderadas via Google Meet com 5 participantes, mais testes assíncronos via Maze. As tarefas cobriam busca de voos, seleção de ida, volta e comparação de tarifas.">
+          Moderated sessions via Google Meet with 5 participants, plus async tests via Maze. Tasks covered flight search, outbound selection, return selection, and fare comparison.
         </p>
-        <img src="assets/09_Section.png" class="modal-img" alt="Moderate test results" onerror="this.style.display='none'">
-        <img src="assets/10_Section.png" class="modal-img" alt="Test results comparison" onerror="this.style.display='none'">
+        <img src="assets/09_Section.png" class="modal-img" alt="Usability tests">
       </div>
 
+      <!-- Section 10: Test results - calendar & return flights -->
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Test results" data-pt="Resultados dos testes">Test results</div>
+        <h2 class="modal-section-title" data-en="Two critical friction points" data-pt="Dois pontos críticos de atrito">Two critical friction points</h2>
+        <img src="assets/10_Section.png" class="modal-img" alt="Test results - date selection and return flights">
+      </div>
+
+      <!-- Section 11: Maze results -->
+      <img src="assets/11_Section.png" class="modal-img" alt="Maze test results">
+
+      <!-- Section 12: Outcomes -->
       <div class="modal-section">
         <div class="modal-section-label" data-en="Outcomes" data-pt="Resultados">Outcomes</div>
         <h2 class="modal-section-title" data-en="From 14% offline to 2.4%" data-pt="De 14% offline para 2,4%">From 14% offline to 2.4%</h2>
         <div class="modal-outcomes-grid">
           <div class="modal-outcome">
             <div class="modal-outcome-num">82.37</div>
-            <div class="modal-outcome-label" data-en="NPS (from 78.6) — H2 2025" data-pt="NPS (de 78,6) — S2 2025">NPS (from 78.6) — H2 2025</div>
+            <div class="modal-outcome-label">NPS (from 78.6) · H2 2025</div>
           </div>
           <div class="modal-outcome">
             <div class="modal-outcome-num">−82%</div>
-            <div class="modal-outcome-label" data-en="Offline bookings (from ~14% to 2.4%)" data-pt="Reservas offline (de ~14% para 2,4%)">Offline bookings (from ~14% to 2.4%)</div>
+            <div class="modal-outcome-label" data-en="Offline bookings (14% → 2.4%)" data-pt="Reservas offline (14% → 2,4%)">Offline bookings (14% → 2.4%)</div>
           </div>
           <div class="modal-outcome">
             <div class="modal-outcome-num">−41%</div>
-            <div class="modal-outcome-label" data-en="Support tickets per transaction" data-pt="Tickets de suporte por transação">Support tickets per transaction</div>
+            <div class="modal-outcome-label" data-en="Support tickets per transaction" data-pt="Tickets por transação">Support tickets per transaction</div>
           </div>
         </div>
-        <img src="assets/12_Section.png" class="modal-img" alt="Outcomes charts" onerror="this.style.display='none'">
+        <img src="assets/12_Section.png" class="modal-img" alt="Outcomes charts">
       </div>
+
+      <!-- Section 14: Final screens / thanks -->
+      <img src="assets/14_Section.png" class="modal-img" alt="Final screens">
+
+      <!-- Mobile screens -->
+      <div class="modal-section">
+        <div class="modal-section-label">Mobile · Flutter</div>
+        <h2 class="modal-section-title" data-en="Web & Mobile" data-pt="Web & Mobile">Web & Mobile</h2>
+        <img src="assets/mobile_screens.png" class="modal-img" alt="Mobile screens">
+      </div>
+
     </div><!-- /case-voll -->
   </div><!-- /modal-content -->
 </div><!-- /modal-overlay -->
@@ -1251,23 +1265,27 @@ html, body {
   <span class="journey-label" id="journey-label">Home</span>
 </div>
 
-<!-- Scroll hint -->
-<div id="scroll-hint">
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-    <path d="M8 3v10M4 9l4 4 4-4" stroke="rgba(245,230,200,0.6)" stroke-width="1.5" stroke-linecap="round"/>
+<!-- Nav arrows -->
+<button class="nav-arrow" id="nav-prev" onclick="navigate(currentSection-1)" title="Previous">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="15 18 9 12 15 6"/>
   </svg>
-  <span data-en="Navigate" data-pt="Navegar">Navigate</span>
-</div>
+</button>
+<button class="nav-arrow" id="nav-next" onclick="navigate(currentSection+1)" title="Next">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="9 18 15 12 9 6"/>
+  </svg>
+</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script>
 // ── State ──
 const sections = [
-  { id: 'home',    x: 700,  y: 900,  label: 'Home',         labelPt: 'Início',  nav: 0 },
-  { id: 'about',   x: 1400, y: 800,  label: 'About',        labelPt: 'Sobre',   nav: 1 },
-  { id: 'case1',   x: 2600, y: 860,  label: 'VOLL Flights', labelPt: 'VOLL',    nav: 2 },
-  { id: 'case2',   x: 3600, y: 840,  label: 'Coming soon',  labelPt: 'Em breve',nav: 3 },
-  { id: 'contact', x: 4500, y: 830,  label: 'Contact',      labelPt: 'Contato', nav: 4 },
+  { id: 'home',    x: 700,  y: 970,  label: 'Home',         labelPt: 'Início',  nav: 0 },
+  { id: 'about',   x: 1400, y: 870,  label: 'About',        labelPt: 'Sobre',   nav: 1 },
+  { id: 'case1',   x: 2600, y: 975,  label: 'VOLL Flights', labelPt: 'VOLL',    nav: 2 },
+  { id: 'case2',   x: 3600, y: 945,  label: 'Coming soon',  labelPt: 'Em breve',nav: 3 },
+  { id: 'contact', x: 4500, y: 950,  label: 'Contact',      labelPt: 'Contato', nav: 4 },
 ];
 
 let currentSection = 0;
@@ -1313,6 +1331,8 @@ function navigate(idx) {
     ? sections[idx].labelPt
     : sections[idx].label;
 
+  updateArrows();
+
   // Animate camera
   const { x, y } = getCameraOffset(idx);
   gsap.to(world, {
@@ -1322,10 +1342,10 @@ function navigate(idx) {
     onComplete: () => { isAnimating = false; }
   });
 
-  // Move ship
+  // Move ship to top of card
   gsap.to(ship, {
     left: next.x,
-    top: next.y - 80,
+    top: next.y - 20,
     duration: 1.6,
     ease: 'power2.inOut',
   });
@@ -1348,7 +1368,7 @@ function navigate(idx) {
 function initCamera() {
   const { x, y } = getCameraOffset(0);
   gsap.set(world, { x, y });
-  gsap.set(ship, { left: 700, top: 820 });
+  gsap.set(ship, { left: 700, top: 950 });
 }
 
 // ── Loader ──
@@ -1356,11 +1376,11 @@ window.addEventListener('DOMContentLoaded', () => {
   initCamera();
   setTimeout(() => {
     document.getElementById('loader').classList.add('hidden');
-    // Entrance animation for home section
     gsap.fromTo('#home-section', { opacity: 0, y: 20 }, {
       opacity: 1, y: 0, duration: 0.8, delay: 0.2, ease: 'power2.out'
     });
     document.querySelector('#home-section').classList.add('visible');
+    updateArrows();
   }, 1800);
 });
 
@@ -1400,17 +1420,22 @@ document.addEventListener('touchend', e => {
   }
 }, { passive: true });
 
-// ── Custom cursor ──
+// ── Ship cursor ──
 const cursor = document.getElementById('cursor');
-let curX = 0, curY = 0;
 document.addEventListener('mousemove', e => {
-  curX = e.clientX; curY = e.clientY;
-  cursor.style.transform = `translate(${curX - 6}px, ${curY - 6}px)`;
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top  = e.clientY + 'px';
 });
 document.querySelectorAll('a, button, .journey-dot, .case-image-strip').forEach(el => {
   el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
   el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
 });
+
+// ── Update nav arrows state ──
+function updateArrows() {
+  document.getElementById('nav-prev').classList.toggle('disabled', currentSection === 0);
+  document.getElementById('nav-next').classList.toggle('disabled', currentSection === sections.length - 1);
+}
 
 // ── Language toggle ──
 function toggleLang() {
