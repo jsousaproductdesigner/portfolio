@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>José Araujo — Product Designer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --navy: #0b1120;
+  --deep: #060c18;
+  --ocean: #0e2040;
+  --water: #162d52;
+  --wave: #1a3660;
+  --parchment: #f5e6c8;
+  --parchment-dark: #e8d4a8;
+  --ink: #2a1f0e;
+  --amber: #c97d2a;
+  --amber-light: #e09540;
+  --gold: #f0c060;
+  --red: #9b2d20;
+  --green-old: #2d5a3d;
+  --cream: #fdf3dc;
+  --muted: #8a7560;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-fell: 'IM Fell English', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --transition: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--deep);
+  font-family: var(--font-body);
+  cursor: none;
+}
+
+/* ── Custom cursor ── */
+#cursor {
+  width: 12px; height: 12px;
+  border: 2px solid var(--amber);
+  border-radius: 50%;
+  position: fixed; top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transition: transform 0.15s ease, background 0.2s ease, width 0.2s ease, height 0.2s ease;
+  mix-blend-mode: difference;
+}
+#cursor.hover {
+  width: 36px; height: 36px;
+  background: rgba(201,125,42,0.15);
+  transform: translate(-50%,-50%) scale(1) !important;
+}
+
+/* ── Top Navigation ── */
+#nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.5rem 2.5rem;
+  background: linear-gradient(to bottom, rgba(6,12,24,0.95), transparent);
+}
+
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--parchment);
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+.nav-logo span { color: var(--amber); }
+
+.nav-links {
+  display: flex; gap: 2rem;
+  list-style: none;
+}
+.nav-links a {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--parchment-dark);
+  text-decoration: none;
+  opacity: 0.75;
+  transition: opacity 0.2s, color 0.2s;
+  cursor: pointer;
+}
+.nav-links a:hover, .nav-links a.active { opacity: 1; color: var(--amber-light); }
+
+/* ── Language toggle ── */
+#lang-toggle {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(201,125,42,0.3);
+  border-radius: 100px;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#lang-toggle:hover { background: rgba(201,125,42,0.15); }
+.lang-btn {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--parchment-dark);
+  opacity: 0.5;
+  transition: opacity 0.2s, color 0.2s;
+}
+.lang-btn.active { opacity: 1; color: var(--amber-light); }
+.lang-sep { width: 1px; height: 10px; background: rgba(201,125,42,0.4); }
+
+/* ── Viewport & World ── */
+#viewport {
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+#world {
+  position: absolute;
+  width: 5200px; height: 3000px;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* ── Ocean background ── */
+#ocean-bg {
+  position: absolute; inset: 0;
+  background: var(--ocean);
+}
+
+/* Animated waves */
+.wave-layer {
+  position: absolute; left: 0; right: 0;
+  height: 3px;
+  background: repeating-linear-gradient(90deg,
+    transparent 0, transparent 40px,
+    rgba(255,255,255,0.04) 40px, rgba(255,255,255,0.04) 80px
+  );
+}
+
+/* ── Islands (land masses) ── */
+.island {
+  position: absolute;
+  border-radius: 50%;
+  filter: drop-shadow(0 8px 32px rgba(0,0,0,0.6));
+}
+
+/* ── Section cards on the map ── */
+.map-section {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s var(--transition);
+}
+.map-section.visible { pointer-events: auto; opacity: 1; }
+
+/* ── Section panels ── */
+.panel {
+  background: var(--parchment);
+  color: var(--ink);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.5);
+}
+.panel::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+  opacity: 0.5;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ── Ship ── */
+#ship {
+  position: absolute;
+  width: 100px; height: 80px;
+  transform: translate(-50%, -50%);
+  animation: bob 3s ease-in-out infinite;
+  z-index: 10;
+  transition: left 1.8s var(--transition), top 1.4s var(--transition);
+}
+@keyframes bob {
+  0%, 100% { transform: translate(-50%, -50%) rotate(-1.5deg) translateY(0); }
+  50% { transform: translate(-50%, -50%) rotate(1.5deg) translateY(-6px); }
+}
+
+/* ── Dotted path ── */
+#map-path {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── Compass rose ── */
+#compass {
+  position: absolute;
+  width: 120px; height: 120px;
+  animation: compass-spin 30s linear infinite;
+  opacity: 0.7;
+  z-index: 5;
+}
+@keyframes compass-spin {
+  from { transform: translate(-50%,-50%) rotate(0deg); }
+  to { transform: translate(-50%,-50%) rotate(360deg); }
+}
+
+/* ── Section: HOME ── */
+#home-card {
+  width: 600px;
+  padding: 3.5rem;
+}
+.home-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 1.25rem;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.home-eyebrow::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(to right, var(--amber), transparent);
+}
+.home-title {
+  font-family: var(--font-display);
+  font-size: 3.8rem;
+  line-height: 1.1;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+}
+.home-title em {
+  font-style: italic;
+  color: var(--amber);
+}
+.home-subtitle {
+  font-family: var(--font-fell);
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--muted);
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+.home-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1rem; margin-bottom: 2.5rem;
+}
+.stat {
+  border-top: 2px solid var(--amber);
+  padding-top: 0.75rem;
+}
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--amber);
+  line-height: 1;
+}
+.stat-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 0.25rem;
+}
+.home-ctas {
+  display: flex; gap: 1rem; flex-wrap: wrap;
+}
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: var(--ink);
+  color: var(--parchment);
+  padding: 0.85rem 1.75rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 2px;
+  transition: background 0.2s, transform 0.15s;
+  cursor: pointer; border: none;
+}
+.btn-primary:hover { background: var(--amber); transform: translateY(-1px); }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: transparent;
+  color: var(--ink);
+  padding: 0.85rem 1.75rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.btn-ghost:hover { background: var(--ink); color: var(--parchment); transform: translateY(-1px); }
+
+/* ── Section: ABOUT ── */
+#about-card {
+  width: 700px;
+  padding: 3rem;
+}
+.section-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 0.75rem;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  line-height: 1.15;
+  color: var(--ink);
+  margin-bottom: 1.75rem;
+}
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1.5rem; margin-bottom: 2rem;
+}
+.about-bio {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--ink);
+  opacity: 0.85;
+  grid-column: 1 / -1;
+  margin-bottom: 0.5rem;
+}
+.xp-item {
+  border-left: 2px solid var(--amber);
+  padding-left: 1rem;
+}
+.xp-role {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.2rem;
+}
+.xp-company {
+  font-size: 0.75rem;
+  color: var(--amber);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2rem;
+}
+.xp-period {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+.skills-row {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  grid-column: 1 / -1;
+}
+.skill-tag {
+  background: rgba(42,31,14,0.08);
+  border: 1px solid rgba(42,31,14,0.15);
+  color: var(--ink);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.75rem;
+  border-radius: 100px;
+}
+
+/* ── Case Study Card ── */
+.case-card {
+  width: 780px;
+  overflow: hidden;
+}
+.case-header {
+  padding: 2.5rem 3rem 2rem;
+}
+.case-meta {
+  display: flex; gap: 2rem; margin-bottom: 1.25rem;
+}
+.case-meta-item { }
+.case-meta-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 0.2rem;
+}
+.case-meta-value {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.case-title {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  line-height: 1.15;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+}
+.case-desc {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--ink);
+  opacity: 0.8;
+  margin-bottom: 1.5rem;
+}
+.case-outcomes {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1rem; margin-bottom: 2rem;
+}
+.outcome {
+  background: var(--ink);
+  color: var(--parchment);
+  padding: 1rem 1.25rem;
+  border-radius: 2px;
+}
+.outcome-num {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--amber-light);
+  margin-bottom: 0.2rem;
+}
+.outcome-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+.case-image-strip {
+  display: flex; overflow-x: auto; gap: 0;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  cursor: grab;
+  border-top: 2px solid var(--parchment-dark);
+}
+.case-image-strip:active { cursor: grabbing; }
+.case-image-strip img {
+  width: 100%; min-width: 780px;
+  height: 300px;
+  object-fit: cover;
+  object-position: top;
+  scroll-snap-align: start;
+  flex-shrink: 0;
+  display: block;
+}
+.case-footer {
+  padding: 1.5rem 3rem;
+  display: flex; align-items: center; justify-content: space-between;
+  border-top: 1px solid var(--parchment-dark);
+}
+.case-tags {
+  display: flex; gap: 0.5rem;
+}
+.case-tag {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: rgba(42,31,14,0.06);
+  padding: 0.25rem 0.6rem;
+  border-radius: 100px;
+  border: 1px solid rgba(42,31,14,0.1);
+}
+
+/* ── Case Study Detail Modal ── */
+#modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 2000;
+  background: rgba(6,12,24,0.95);
+  backdrop-filter: blur(4px);
+  overflow-y: auto;
+}
+#modal-overlay.open { display: block; }
+#modal-content {
+  max-width: 860px;
+  margin: 4rem auto;
+  padding: 0 2rem 4rem;
+}
+.modal-close {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--parchment-dark);
+  background: none; border: none;
+  cursor: pointer; padding: 1rem 0;
+  opacity: 0.6; transition: opacity 0.2s;
+  margin-bottom: 2rem;
+}
+.modal-close:hover { opacity: 1; }
+.modal-header {
+  margin-bottom: 3rem;
+}
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--parchment);
+  line-height: 1.1;
+  margin-bottom: 0.75rem;
+}
+.modal-subtitle {
+  font-family: var(--font-fell);
+  font-style: italic;
+  font-size: 1.25rem;
+  color: var(--amber);
+}
+.modal-meta-row {
+  display: flex; gap: 3rem; margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(245,230,200,0.15);
+}
+.modal-meta-item .label {
+  font-size: 0.6rem; letter-spacing: 0.25em;
+  text-transform: uppercase; color: var(--amber);
+  margin-bottom: 0.35rem;
+}
+.modal-meta-item .value {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--parchment);
+}
+.modal-section {
+  margin-bottom: 3rem;
+}
+.modal-section-label {
+  font-size: 0.6rem; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--amber);
+  margin-bottom: 1rem;
+}
+.modal-section-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--parchment);
+  margin-bottom: 1rem;
+}
+.modal-body {
+  font-size: 1rem; line-height: 1.75;
+  color: rgba(245,230,200,0.8);
+}
+.modal-img {
+  width: 100%; border-radius: 4px;
+  margin: 1.5rem 0;
+  display: block;
+  border: 1px solid rgba(245,230,200,0.1);
+}
+.modal-outcomes-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem; margin: 2rem 0;
+}
+.modal-outcome {
+  border-top: 2px solid var(--amber);
+  padding-top: 1rem;
+}
+.modal-outcome-num {
+  font-family: var(--font-display);
+  font-size: 2.5rem; font-weight: 700;
+  color: var(--amber-light); line-height: 1;
+  margin-bottom: 0.35rem;
+}
+.modal-outcome-label {
+  font-size: 0.75rem; color: rgba(245,230,200,0.6);
+  line-height: 1.4;
+}
+.challenge-cards {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1rem; margin: 1.5rem 0;
+}
+.challenge-card {
+  background: rgba(245,230,200,0.05);
+  border: 1px solid rgba(245,230,200,0.1);
+  border-radius: 4px;
+  padding: 1.25rem;
+}
+.challenge-card h4 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--parchment);
+  margin-bottom: 0.5rem;
+}
+.challenge-card p {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: rgba(245,230,200,0.6);
+}
+
+/* ── Contact section ── */
+#contact-card {
+  width: 540px;
+  padding: 3.5rem;
+  text-align: center;
+}
+.x-mark {
+  font-family: var(--font-display);
+  font-size: 5rem;
+  font-weight: 700;
+  color: var(--red);
+  line-height: 1;
+  margin-bottom: 1rem;
+  display: block;
+  animation: pulse-x 2s ease-in-out infinite;
+}
+@keyframes pulse-x {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.contact-title {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+}
+.contact-sub {
+  font-family: var(--font-fell);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--muted);
+  margin-bottom: 2.5rem;
+  line-height: 1.5;
+}
+.contact-links {
+  display: flex; flex-direction: column; gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+.contact-link {
+  display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.85rem;
+  border: 1.5px solid rgba(42,31,14,0.2);
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+.contact-link:hover {
+  background: var(--ink);
+  color: var(--parchment);
+  border-color: var(--ink);
+  transform: translateX(4px);
+}
+.contact-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* ── Progress / Journey indicator ── */
+#journey-progress {
+  position: fixed;
+  bottom: 2rem; left: 50%;
+  transform: translateX(-50%);
+  display: flex; align-items: center; gap: 0.75rem;
+  z-index: 500;
+  background: rgba(6,12,24,0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(201,125,42,0.2);
+  border-radius: 100px;
+  padding: 0.6rem 1.25rem;
+}
+.journey-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(245,230,200,0.2);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.journey-dot.active { background: var(--amber); transform: scale(1.4); }
+.journey-dot:hover { background: var(--amber-light); }
+.journey-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(245,230,200,0.5);
+  margin-left: 0.25rem;
+  min-width: 80px;
+  transition: all 0.3s;
+}
+
+/* ── Scroll hint ── */
+#scroll-hint {
+  position: fixed; bottom: 5rem; right: 2.5rem;
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  z-index: 500; opacity: 0.5;
+  font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--parchment-dark);
+  animation: fadeInOut 3s ease-in-out 2s infinite;
+}
+#scroll-hint svg { animation: arrow-bounce 1.5s ease-in-out infinite; }
+@keyframes arrow-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.15; }
+}
+
+/* ── Wave animations (decorative) ── */
+@keyframes wave-move {
+  from { background-position: 0 0; }
+  to { background-position: 80px 0; }
+}
+
+/* ── Loading screen ── */
+#loader {
+  position: fixed; inset: 0;
+  background: var(--deep);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 9000;
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+#loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.loader-ship { font-size: 4rem; animation: loader-bob 1s ease-in-out infinite; }
+@keyframes loader-bob {
+  0%, 100% { transform: rotate(-5deg) translateY(0); }
+  50% { transform: rotate(5deg) translateY(-10px); }
+}
+.loader-text {
+  font-family: var(--font-fell);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--parchment-dark);
+  margin-top: 1.5rem;
+  opacity: 0.7;
+}
+.loader-bar {
+  width: 200px; height: 1px;
+  background: rgba(245,230,200,0.15);
+  margin-top: 2rem; position: relative; overflow: hidden;
+}
+.loader-bar-fill {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: var(--amber);
+  animation: fill-bar 1.6s ease-in-out forwards;
+}
+@keyframes fill-bar { from { width: 0; } to { width: 100%; } }
+
+/* ── Media: mobile ── */
+@media (max-width: 768px) {
+  html, body { overflow: auto; }
+  #viewport { overflow: auto; height: auto; }
+  #world {
+    width: 100%;
+    height: auto;
+    position: relative;
+    transform: none !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+    padding: 6rem 1rem 4rem;
+    background: var(--ocean);
+  }
+  #ocean-bg, #ship, #compass, #map-path { display: none; }
+  .map-section {
+    position: relative; transform: none;
+    opacity: 1 !important; pointer-events: auto;
+    width: 100% !important;
+  }
+  .panel, #home-card, #about-card, .case-card, #contact-card {
+    width: 100% !important;
+  }
+  #journey-progress { display: none; }
+  #scroll-hint { display: none; }
+  .home-title { font-size: 2.5rem; }
+  .case-image-strip img { min-width: 100%; }
+  .modal-outcomes-grid, .challenge-cards { grid-template-columns: 1fr; }
+  .modal-title { font-size: 2rem; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Loading screen -->
+<div id="loader">
+  <div class="loader-ship">⛵</div>
+  <div class="loader-text" data-en="Charting the course..." data-pt="Traçando a rota...">Charting the course...</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<!-- Custom cursor -->
+<div id="cursor"></div>
+
+<!-- Navigation -->
+<nav id="nav">
+  <div class="nav-logo" onclick="navigate(0)">
+    JA<span>.</span>
+  </div>
+  <ul class="nav-links">
+    <li><a onclick="navigate(0)" class="active" data-en="Home" data-pt="Início">Home</a></li>
+    <li><a onclick="navigate(1)" data-en="About" data-pt="Sobre">About</a></li>
+    <li><a onclick="navigate(2)" data-en="Work" data-pt="Cases">Work</a></li>
+    <li><a onclick="navigate(4)" data-en="Contact" data-pt="Contato">Contact</a></li>
+  </ul>
+  <div id="lang-toggle" onclick="toggleLang()">
+    <span class="lang-btn active" id="lang-en">EN</span>
+    <div class="lang-sep"></div>
+    <span class="lang-btn" id="lang-pt">PT</span>
+  </div>
+</nav>
+
+<!-- Viewport -->
+<div id="viewport">
+<div id="world">
+
+  <!-- Ocean background -->
+  <div id="ocean-bg"></div>
+
+  <!-- SVG map layer: islands, paths, compass -->
+  <svg id="map-path" xmlns="http://www.w3.org/2000/svg">
+    <!-- Wave texture lines -->
+    <defs>
+      <pattern id="waves" x="0" y="0" width="80" height="20" patternUnits="userSpaceOnUse">
+        <path d="M0 10 Q20 4 40 10 Q60 16 80 10" stroke="rgba(255,255,255,0.04)" stroke-width="1" fill="none"/>
+      </pattern>
+      <filter id="blur-sm"><feGaussianBlur stdDeviation="2"/></filter>
+    </defs>
+    <rect width="5200" height="3000" fill="url(#waves)"/>
+
+    <!-- Dotted journey path -->
+    <path id="journey-path" 
+      d="M 700 900 Q 1000 700 1400 800 Q 1700 900 2200 850 Q 2600 800 3000 900 Q 3400 1000 3800 820 Q 4050 700 4400 820"
+      stroke="rgba(201,125,42,0.4)" stroke-width="2" stroke-dasharray="12 10" fill="none"
+      stroke-linecap="round"/>
+
+    <!-- Island 1: home (large) -->
+    <ellipse cx="700" cy="920" rx="260" ry="180" fill="#1a3a1f" opacity="0.9"/>
+    <ellipse cx="700" cy="910" rx="220" ry="150" fill="#2d5a3d" opacity="0.8"/>
+    <ellipse cx="700" cy="900" rx="170" ry="110" fill="#3a7048" opacity="0.7"/>
+    <!-- beach -->
+    <ellipse cx="700" cy="970" rx="200" ry="50" fill="#8a7540" opacity="0.4"/>
+
+    <!-- Island 2: about -->
+    <ellipse cx="1400" cy="820" rx="200" ry="140" fill="#1a3a1f" opacity="0.9"/>
+    <ellipse cx="1400" cy="810" rx="160" ry="110" fill="#2d5a3d" opacity="0.8"/>
+    <ellipse cx="1400" cy="800" rx="120" ry="80" fill="#3a7048" opacity="0.7"/>
+    <ellipse cx="1400" cy="860" rx="150" ry="40" fill="#8a7540" opacity="0.4"/>
+
+    <!-- Island 3: case 1 (VOLL) -->
+    <ellipse cx="2600" cy="870" rx="280" ry="180" fill="#1a3a1f" opacity="0.9"/>
+    <ellipse cx="2600" cy="858" rx="240" ry="150" fill="#2d5a3d" opacity="0.8"/>
+    <ellipse cx="2600" cy="845" rx="190" ry="115" fill="#3a7048" opacity="0.7"/>
+    <ellipse cx="2600" cy="930" rx="230" ry="55" fill="#8a7540" opacity="0.4"/>
+
+    <!-- Island 4: future case (placeholder) -->
+    <ellipse cx="3600" cy="860" rx="210" ry="140" fill="#1a3a1f" opacity="0.7"/>
+    <ellipse cx="3600" cy="848" rx="170" ry="110" fill="#2d5a3d" opacity="0.6"/>
+    <ellipse cx="3600" cy="836" rx="130" ry="80" fill="#3a7048" opacity="0.5"/>
+    <!-- Skull on this island -->
+    <text x="3600" y="850" text-anchor="middle" font-size="32" opacity="0.5" fill="var(--parchment)">☠</text>
+
+    <!-- Island 5: contact (X island) -->
+    <ellipse cx="4500" cy="840" rx="240" ry="155" fill="#3a1f1f" opacity="0.9"/>
+    <ellipse cx="4500" cy="828" rx="195" ry="120" fill="#5a2d2d" opacity="0.8"/>
+    <ellipse cx="4500" cy="815" rx="150" ry="90" fill="#7a3d3d" opacity="0.7"/>
+    <ellipse cx="4500" cy="890" rx="185" ry="45" fill="#8a6040" opacity="0.4"/>
+
+    <!-- Decorative sea monsters / details -->
+    <text x="1000" y="1200" font-size="48" opacity="0.12" fill="var(--parchment)">🐋</text>
+    <text x="2100" y="500" font-size="36" opacity="0.1" fill="var(--parchment)">🦑</text>
+    <text x="3200" y="1150" font-size="40" opacity="0.1" fill="var(--parchment)">🐊</text>
+
+    <!-- Map border/frame decoration -->
+    <rect x="30" y="30" width="5140" height="2940" 
+      stroke="rgba(201,125,42,0.15)" stroke-width="2" fill="none" rx="8"/>
+    <rect x="50" y="50" width="5100" height="2900" 
+      stroke="rgba(201,125,42,0.08)" stroke-width="1" fill="none" rx="6"/>
+
+    <!-- Coordinates text (decorative) -->
+    <text x="100" y="80" font-family="'DM Sans', sans-serif" font-size="11" fill="rgba(201,125,42,0.3)" letter-spacing="3">25°46'S 43°11'W</text>
+    <text x="4900" y="80" font-family="'DM Sans', sans-serif" font-size="11" fill="rgba(201,125,42,0.3)" letter-spacing="3" text-anchor="end">48°37'W 22°54'S</text>
+
+    <!-- Compass rose -->
+    <g id="compass" transform="translate(4700,280)">
+      <!-- Outer ring -->
+      <circle r="55" fill="none" stroke="rgba(201,125,42,0.4)" stroke-width="1.5"/>
+      <circle r="45" fill="none" stroke="rgba(201,125,42,0.2)" stroke-width="0.5"/>
+      <!-- N arrow -->
+      <polygon points="0,-40 -8,-10 0,-18 8,-10" fill="rgba(201,125,42,0.8)"/>
+      <!-- S arrow -->
+      <polygon points="0,40 -8,10 0,18 8,10" fill="rgba(245,230,200,0.4)"/>
+      <!-- E/W -->
+      <polygon points="40,0 10,-8 18,0 10,8" fill="rgba(245,230,200,0.4)"/>
+      <polygon points="-40,0 -10,-8 -18,0 -10,8" fill="rgba(245,230,200,0.4)"/>
+      <!-- NESW labels -->
+      <text y="-50" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(201,125,42,0.8)" letter-spacing="1">N</text>
+      <text y="58" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,230,200,0.5)" letter-spacing="1">S</text>
+      <text x="52" y="3" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,230,200,0.5)" letter-spacing="1">E</text>
+      <text x="-52" y="3" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,230,200,0.5)" letter-spacing="1">W</text>
+      <!-- Center dot -->
+      <circle r="4" fill="rgba(201,125,42,0.8)"/>
+      <circle r="1.5" fill="var(--deep)"/>
+    </g>
+
+    <!-- Island labels -->
+    <text x="700" y="780" text-anchor="middle" font-family="'IM Fell English',serif" font-size="13" fill="rgba(245,230,200,0.5)" font-style="italic">Ilha de Partida</text>
+    <text x="1400" y="680" text-anchor="middle" font-family="'IM Fell English',serif" font-size="12" fill="rgba(245,230,200,0.4)" font-style="italic">Ilha do Navegante</text>
+    <text x="2600" y="730" text-anchor="middle" font-family="'IM Fell English',serif" font-size="13" fill="rgba(245,230,200,0.4)" font-style="italic">Ilha dos Casos</text>
+    <text x="3600" y="710" text-anchor="middle" font-family="'IM Fell English',serif" font-size="11" fill="rgba(245,230,200,0.3)" font-style="italic">Terra Incógnita</text>
+    <text x="4500" y="690" text-anchor="middle" font-family="'IM Fell English',serif" font-size="13" fill="rgba(245,230,200,0.5)" font-style="italic">Ilha do Tesouro</text>
+  </svg>
+
+  <!-- Animated Ship -->
+  <div id="ship" style="left:700px; top:820px;">
+    <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+      <!-- Hull -->
+      <path d="M10 55 Q20 70 50 72 Q80 70 90 55 L85 50 L15 50 Z" fill="#5a3a1a" stroke="#3a2010" stroke-width="1"/>
+      <!-- Sail 1 (main) -->
+      <path d="M50 10 L50 48 L28 42 Z" fill="rgba(245,230,200,0.9)" stroke="rgba(201,125,42,0.5)" stroke-width="0.8"/>
+      <!-- Sail 2 (fore) -->
+      <path d="M50 18 L50 48 L68 43 Z" fill="rgba(245,230,200,0.75)" stroke="rgba(201,125,42,0.5)" stroke-width="0.8"/>
+      <!-- Mast -->
+      <line x1="50" y1="8" x2="50" y2="52" stroke="#3a2010" stroke-width="1.5"/>
+      <!-- Flag -->
+      <path d="M50 8 L62 12 L50 16" fill="rgba(155,45,32,0.8)"/>
+      <!-- Portholes -->
+      <circle cx="35" cy="57" r="3" fill="rgba(255,200,80,0.4)" stroke="#3a2010" stroke-width="0.5"/>
+      <circle cx="65" cy="57" r="3" fill="rgba(255,200,80,0.4)" stroke="#3a2010" stroke-width="0.5"/>
+      <!-- Wake -->
+      <path d="M15 68 Q30 72 50 70 Q70 72 85 68" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+    </svg>
+  </div>
+
+  <!-- ══════════ SECTION 0: HOME ══════════ -->
+  <div class="map-section visible" id="home-section" style="left:700px; top:900px;">
+    <div class="panel" id="home-card">
+      <div class="home-eyebrow" data-en="Product Designer · São Paulo, Brazil" data-pt="Product Designer · São Paulo, Brasil">
+        Product Designer · São Paulo, Brazil
+      </div>
+      <h1 class="home-title">
+        José<br><em>Araujo</em>
+      </h1>
+      <p class="home-subtitle" data-en="9 years crafting digital experiences that move numbers." data-pt="9 anos criando experiências digitais que movem números.">
+        9 years crafting digital experiences that move numbers.
+      </p>
+      <div class="home-stats">
+        <div class="stat">
+          <div class="stat-num">200%</div>
+          <div class="stat-label" data-en="Conversion lift" data-pt="Aumento de conversão">Conversion lift</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">550K</div>
+          <div class="stat-label" data-en="Users impacted" data-pt="Usuários impactados">Users impacted</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">−88%</div>
+          <div class="stat-label" data-en="Support tickets" data-pt="Tickets de suporte">Support tickets</div>
+        </div>
+      </div>
+      <div class="home-ctas">
+        <button class="btn-primary" onclick="navigate(2)" data-en="⚓ Explore my work" data-pt="⚓ Ver meu trabalho">⚓ Explore my work</button>
+        <button class="btn-ghost" onclick="navigate(1)" data-en="About me" data-pt="Sobre mim">About me</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SECTION 1: ABOUT ══════════ -->
+  <div class="map-section" id="about-section" style="left:1400px; top:800px;">
+    <div class="panel" id="about-card">
+      <div class="section-label" data-en="Navigator's log" data-pt="Diário de bordo">Navigator's log</div>
+      <h2 class="section-title" data-en="Who am I" data-pt="Quem sou eu">Who am I</h2>
+      <p class="about-bio" data-en="Senior Product Designer with 9 years of experience turning user research into design solutions that generate measurable results. Expert in UX/UI, Design Systems, and Figma. Fluent in Portuguese, English, and Italian. I work at the intersection of data and empathy." data-pt="Senior Product Designer com 9 anos de experiência transformando pesquisa em soluções de design com resultados mensuráveis. Expert em UX/UI, Design Systems e Figma. Fluente em Português, Inglês e Italiano. Trabalho na interseção de dados e empatia.">
+        Senior Product Designer with 9 years of experience turning user research into design solutions that generate measurable results. Expert in UX/UI, Design Systems, and Figma. Fluent in Portuguese, English, and Italian. I work at the intersection of data and empathy.
+      </p>
+      <div class="about-grid">
+        <div class="xp-item">
+          <div class="xp-role" data-en="Product Designer Specialist" data-pt="Product Designer Specialist">Product Designer Specialist</div>
+          <div class="xp-company">VOLL</div>
+          <div class="xp-period" data-en="2024 – Present" data-pt="2024 – Presente">2024 – Present</div>
+        </div>
+        <div class="xp-item">
+          <div class="xp-role" data-en="Lead Product Designer" data-pt="Lead Product Designer">Lead Product Designer</div>
+          <div class="xp-company">Doris</div>
+          <div class="xp-period">2021 – 2024</div>
+        </div>
+        <div class="xp-item">
+          <div class="xp-role">UX/UI Designer</div>
+          <div class="xp-company">FutureBrand SP</div>
+          <div class="xp-period">2019 – 2021</div>
+        </div>
+        <div class="xp-item">
+          <div class="xp-role" data-en="Education" data-pt="Formação">Education</div>
+          <div class="xp-company">Belas Artes + Unibo (IT)</div>
+          <div class="xp-period">MBA · FIAP 2024</div>
+        </div>
+        <div class="skills-row">
+          <span class="skill-tag">UX Design</span>
+          <span class="skill-tag">UI Design</span>
+          <span class="skill-tag">Design Systems</span>
+          <span class="skill-tag">Figma</span>
+          <span class="skill-tag">User Research</span>
+          <span class="skill-tag">A/B Testing</span>
+          <span class="skill-tag">Usability Testing</span>
+          <span class="skill-tag">Flutter</span>
+        </div>
+      </div>
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <a href="https://www.linkedin.com/in/josearaujose" target="_blank" class="btn-primary" style="font-size:0.7rem;" data-en="↗ LinkedIn" data-pt="↗ LinkedIn">↗ LinkedIn</a>
+        <a href="https://www.behance.net/josearaujo" target="_blank" class="btn-ghost" style="font-size:0.7rem;" data-en="↗ Behance" data-pt="↗ Behance">↗ Behance</a>
+        <button class="btn-ghost" style="font-size:0.7rem;" onclick="navigate(4)" data-en="Contact me →" data-pt="Fale comigo →">Contact me →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SECTION 2: VOLL FLIGHTS CASE ══════════ -->
+  <div class="map-section" id="case1-section" style="left:2600px; top:860px;">
+    <div class="panel case-card">
+      <div class="case-header">
+        <div class="case-meta">
+          <div class="case-meta-item">
+            <div class="case-meta-label" data-en="Role" data-pt="Papel">Role</div>
+            <div class="case-meta-value" data-en="Product Designer" data-pt="Product Designer">Product Designer</div>
+          </div>
+          <div class="case-meta-item">
+            <div class="case-meta-label" data-en="Timeline" data-pt="Duração">Timeline</div>
+            <div class="case-meta-value" data-en="2 months" data-pt="2 meses">2 months</div>
+          </div>
+          <div class="case-meta-item">
+            <div class="case-meta-label">Platform</div>
+            <div class="case-meta-value">Web & Mobile</div>
+          </div>
+        </div>
+        <h2 class="case-title">VOLL Flights</h2>
+        <p class="case-desc" data-en="Reduction of offline support and usability friction in a corporate travel flight booking platform — from search to reservation." data-pt="Redução de suporte offline e atrito de usabilidade em uma plataforma de reserva de passagens aéreas corporativas — da busca à reserva.">
+          Reduction of offline support and usability friction in a corporate travel flight booking platform — from search to reservation.
+        </p>
+        <div class="case-outcomes">
+          <div class="outcome">
+            <div class="outcome-num">−82%</div>
+            <div class="outcome-label" data-en="Offline bookings" data-pt="Reservas offline">Offline bookings</div>
+          </div>
+          <div class="outcome">
+            <div class="outcome-num">+4pts</div>
+            <div class="outcome-label">NPS</div>
+          </div>
+          <div class="outcome">
+            <div class="outcome-num">−41%</div>
+            <div class="outcome-label" data-en="Support tickets" data-pt="Tickets de suporte">Support tickets</div>
+          </div>
+        </div>
+      </div>
+      <div class="case-image-strip" id="strip1">
+        <img src="assets/01_Section.png" alt="VOLL Flights web screens" loading="lazy">
+        <img src="assets/07_Section.png" alt="User pains and business needs" loading="lazy">
+        <img src="assets/12_Section.png" alt="Outcomes and results" loading="lazy">
+        <img src="assets/mobile_screens.png" alt="VOLL Flights mobile screens" loading="lazy">
+      </div>
+      <div class="case-footer">
+        <div class="case-tags">
+          <span class="case-tag">UX Research</span>
+          <span class="case-tag">B2B SaaS</span>
+          <span class="case-tag">Corporate Travel</span>
+          <span class="case-tag">Flutter</span>
+        </div>
+        <button class="btn-primary" onclick="openCase('voll')" data-en="Read case →" data-pt="Ver case →">Read case →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SECTION 3: FUTURE CASE (placeholder) ══════════ -->
+  <div class="map-section" id="case2-section" style="left:3600px; top:840px;">
+    <div class="panel" style="width:480px; padding:3rem; text-align:center;">
+      <div class="section-label" data-en="Coming soon" data-pt="Em breve">Coming soon</div>
+      <h2 class="section-title" style="font-size:2rem;" data-en="Next case study" data-pt="Próximo case">Next case study</h2>
+      <p style="font-size:0.85rem; line-height:1.7; color:var(--muted); margin-bottom:2rem;" data-en="More adventures ahead. This island is still being mapped — check back soon." data-pt="Mais aventuras pela frente. Esta ilha ainda está sendo mapeada — volte em breve.">
+        More adventures ahead. This island is still being mapped — check back soon.
+      </p>
+      <div style="font-size:3rem; margin-bottom:1.5rem; opacity:0.3;">🗺️</div>
+      <button class="btn-ghost" onclick="navigate(4)" style="width:100%;" data-en="Skip to contact →" data-pt="Ir para contato →">Skip to contact →</button>
+    </div>
+  </div>
+
+  <!-- ══════════ SECTION 4: CONTACT ══════════ -->
+  <div class="map-section" id="contact-section" style="left:4500px; top:830px;">
+    <div class="panel" id="contact-card">
+      <span class="x-mark">✕</span>
+      <h2 class="contact-title" data-en="Let's talk" data-pt="Vamos conversar">Let's talk</h2>
+      <p class="contact-sub" data-en="The treasure at the end of every map is a good conversation. Let's find yours." data-pt="O tesouro no fim de todo mapa é uma boa conversa. Vamos encontrar o seu.">
+        The treasure at the end of every map is a good conversation. Let's find yours.
+      </p>
+      <div class="contact-links">
+        <a href="mailto:jdeasousa@gmail.com" class="contact-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          jdeasousa@gmail.com
+        </a>
+        <a href="https://www.linkedin.com/in/josearaujose" target="_blank" class="contact-link">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          <span data-en="Connect on LinkedIn" data-pt="Conectar no LinkedIn">Connect on LinkedIn</span>
+        </a>
+        <a href="https://www.behance.net/josearaujo" target="_blank" class="contact-link">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 7h-7v-2h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14H15.97c.13 3.211 3.483 3.312 4.588 2.029H23.726zm-7.726-3h3.79c-.254-1.741-1.354-2.219-1.795-2.219-1.587 0-1.868 1.039-1.995 2.219z"/></svg>
+          Behance Portfolio
+        </a>
+        <a href="tel:+5511969148894" class="contact-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.07 12 19.79 19.79 0 0 1 .97 3.41 2 2 0 0 1 2.94 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          +55 11 96914-8894
+        </a>
+      </div>
+      <p style="font-size:0.7rem; color:var(--muted); text-align:center; letter-spacing:0.05em;" data-en="São Paulo, Brazil · Available for remote international roles" data-pt="São Paulo, Brasil · Disponível para vagas remotas internacionais">
+        São Paulo, Brazil · Available for remote international roles
+      </p>
+    </div>
+  </div>
+
+</div><!-- /world -->
+</div><!-- /viewport -->
+
+<!-- Case Study Detail Modal -->
+<div id="modal-overlay">
+  <div id="modal-content">
+    <button class="modal-close" onclick="closeCase()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M13 1L1 13M1 1l12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span data-en="Back to map" data-pt="Voltar ao mapa">Back to map</span>
+    </button>
+
+    <!-- VOLL Case Study Content -->
+    <div id="case-voll">
+      <div class="modal-header">
+        <div style="font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--amber); margin-bottom:0.75rem;">Case Study · 2024</div>
+        <h1 class="modal-title">VOLL Flights</h1>
+        <p class="modal-subtitle" data-en="Reduction of offline support and usability friction" data-pt="Redução de suporte offline e atrito de usabilidade">
+          Reduction of offline support and usability friction
+        </p>
+        <div class="modal-meta-row">
+          <div class="modal-meta-item">
+            <div class="label" data-en="Role" data-pt="Papel">Role</div>
+            <div class="value" data-en="Product Designer" data-pt="Product Designer">Product Designer</div>
+          </div>
+          <div class="modal-meta-item">
+            <div class="label" data-en="Timeline" data-pt="Duração">Timeline</div>
+            <div class="value" data-en="2 months" data-pt="2 meses">2 months</div>
+          </div>
+          <div class="modal-meta-item">
+            <div class="label">Platform</div>
+            <div class="value">Web & Mobile (Flutter)</div>
+          </div>
+          <div class="modal-meta-item">
+            <div class="label">Company</div>
+            <div class="value">VOLL</div>
+          </div>
+        </div>
+      </div>
+
+      <img src="assets/cover.png" class="modal-img" alt="VOLL Flights cover" onerror="this.style.display='none'">
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Context" data-pt="Contexto">Context</div>
+        <h2 class="modal-section-title" data-en="Corporate travel, real friction" data-pt="Viagem corporativa, atrito real">Corporate travel, real friction</h2>
+        <p class="modal-body" data-en="VOLL is a corporate travel management platform serving companies across Brazil. After nearly 2 years since launching the air ticket booking product, significant user feedback and operational data revealed critical problems that were costing the business — and frustrating users." data-pt="VOLL é uma plataforma de gestão de viagens corporativas que atende empresas no Brasil. Após quase 2 anos desde o lançamento do produto de reserva de passagens aéreas, feedbacks de usuários e dados operacionais revelaram problemas críticos que custavam ao negócio — e frustravam os usuários.">
+          VOLL is a corporate travel management platform serving companies across Brazil. After nearly 2 years since launching the air ticket booking product, significant user feedback and operational data revealed critical problems that were costing the business — and frustrating users.
+        </p>
+        <img src="assets/02_Section.png" class="modal-img" alt="Context" onerror="this.style.display='none'">
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="The problem" data-pt="O problema">The problem</div>
+        <h2 class="modal-section-title" data-en="At least 15% chose the phone over the app" data-pt="Pelo menos 15% preferiram o telefone ao app">At least 15% chose the phone over the app</h2>
+        <p class="modal-body" data-en="The experience generated enough confusion that at least 15% of users abandoned making reservations through the platform and resorted to offline support. Three core issues drove this:" data-pt="A experiência gerava confusão suficiente para que pelo menos 15% dos usuários abandonassem as reservas pela plataforma e recorressem ao suporte offline. Três problemas centrais causavam isso:">
+          The experience generated enough confusion that at least 15% of users abandoned making reservations through the platform and resorted to offline support. Three core issues drove this:
+        </p>
+        <div class="challenge-cards">
+          <div class="challenge-card">
+            <h4 data-en="Cognitive overload" data-pt="Sobrecarga cognitiva">Cognitive overload</h4>
+            <p data-en="Confusion selecting outbound, return, and combined flights. Users didn't know the total cost before completing the booking." data-pt="Confusão ao selecionar voos de ida, volta e combinados. Usuários não sabiam o custo total antes de finalizar a reserva.">Confusion selecting outbound, return, and combined flights. Users didn't know the total cost before completing the booking.</p>
+          </div>
+          <div class="challenge-card">
+            <h4 data-en="Backend limitation" data-pt="Limitação de backend">Backend limitation</h4>
+            <p data-en="The system couldn't map all round-trip tickets during search, reducing available options and increasing loading time." data-pt="O sistema não conseguia mapear todas as passagens de ida e volta durante a busca, reduzindo opções e aumentando o carregamento.">The system couldn't map all round-trip tickets during search, reducing available options and increasing loading time.</p>
+          </div>
+          <div class="challenge-card">
+            <h4 data-en="Language mismatch" data-pt="Linguagem inadequada">Language mismatch</h4>
+            <p data-en="Technical terminology didn't match how users talked about flights. Visual hierarchy was overloaded with excessive elements." data-pt="Terminologia técnica não correspondia à linguagem dos usuários. A hierarquia visual estava sobrecarregada com elementos excessivos.">Technical terminology didn't match how users talked about flights. Visual hierarchy was overloaded with excessive elements.</p>
+          </div>
+        </div>
+        <img src="assets/07_Section.png" class="modal-img" alt="User pains and business needs" onerror="this.style.display='none'">
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Research & Discovery" data-pt="Pesquisa & Descoberta">Research & Discovery</div>
+        <h2 class="modal-section-title" data-en="Understanding the full system" data-pt="Entendendo o sistema completo">Understanding the full system</h2>
+        <p class="modal-body" data-en="I mapped the original user/system flow to understand where confusion emerged. The backend segmented outbound, return, and combined fares separately — forcing users to navigate three distinct tabs. The new ideal flow would let the backend scan all fares simultaneously, showing users a single streamlined experience." data-pt="Mapeei o fluxo original usuário/sistema para entender onde surgiam as confusões. O backend separava tarifas de ida, volta e combinadas — forçando os usuários a navegar por três abas distintas. O novo fluxo ideal permitiria ao backend escanear todas as tarifas simultaneamente, apresentando uma experiência única e simplificada.">
+          I mapped the original user/system flow to understand where confusion emerged. The backend segmented outbound, return, and combined fares separately — forcing users to navigate three distinct tabs. The new ideal flow would let the backend scan all fares simultaneously, showing users a single streamlined experience.
+        </p>
+        <img src="assets/08_Section.png" class="modal-img" alt="User system flow" onerror="this.style.display='none'">
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Design process" data-pt="Processo de design">Design process</div>
+        <h2 class="modal-section-title" data-en="The redesign — 5 key decisions" data-pt="O redesign — 5 decisões-chave">The redesign — 5 key decisions</h2>
+        <img src="assets/05_Section.png" class="modal-img" alt="Design process part 1" onerror="this.style.display='none'">
+        <img src="assets/01_Section.png" class="modal-img" alt="Final web screens" onerror="this.style.display='none'">
+        <img src="assets/mobile_screens.png" class="modal-img" alt="Final mobile screens" onerror="this.style.display='none'">
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Testing" data-pt="Testes">Testing</div>
+        <h2 class="modal-section-title" data-en="Moderated + Maze testing" data-pt="Testes moderados + Maze">Moderated + Maze testing</h2>
+        <p class="modal-body" data-en="I ran moderated tests via Google Meets (5 participants) and async tests via Maze platform. Key findings: the date selection calendar needed simplification, and return flight selection directly below the outbound flight caused confusion for 4 out of 5 participants." data-pt="Realizei testes moderados via Google Meets (5 participantes) e testes assíncronos via Maze. Principais descobertas: o calendário de seleção de datas precisava de simplificação, e a seleção de voo de retorno diretamente abaixo do voo de ida gerou confusão em 4 de 5 participantes.">
+          I ran moderated tests via Google Meets (5 participants) and async tests via Maze platform. Key findings: the date selection calendar needed simplification, and return flight selection directly below the outbound flight caused confusion for 4 out of 5 participants.
+        </p>
+        <img src="assets/09_Section.png" class="modal-img" alt="Moderate test results" onerror="this.style.display='none'">
+        <img src="assets/10_Section.png" class="modal-img" alt="Test results comparison" onerror="this.style.display='none'">
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Outcomes" data-pt="Resultados">Outcomes</div>
+        <h2 class="modal-section-title" data-en="From 14% offline to 2.4%" data-pt="De 14% offline para 2,4%">From 14% offline to 2.4%</h2>
+        <div class="modal-outcomes-grid">
+          <div class="modal-outcome">
+            <div class="modal-outcome-num">82.37</div>
+            <div class="modal-outcome-label" data-en="NPS (from 78.6) — H2 2025" data-pt="NPS (de 78,6) — S2 2025">NPS (from 78.6) — H2 2025</div>
+          </div>
+          <div class="modal-outcome">
+            <div class="modal-outcome-num">−82%</div>
+            <div class="modal-outcome-label" data-en="Offline bookings (from ~14% to 2.4%)" data-pt="Reservas offline (de ~14% para 2,4%)">Offline bookings (from ~14% to 2.4%)</div>
+          </div>
+          <div class="modal-outcome">
+            <div class="modal-outcome-num">−41%</div>
+            <div class="modal-outcome-label" data-en="Support tickets per transaction" data-pt="Tickets de suporte por transação">Support tickets per transaction</div>
+          </div>
+        </div>
+        <img src="assets/12_Section.png" class="modal-img" alt="Outcomes charts" onerror="this.style.display='none'">
+      </div>
+    </div><!-- /case-voll -->
+  </div><!-- /modal-content -->
+</div><!-- /modal-overlay -->
+
+<!-- Journey progress indicator -->
+<div id="journey-progress">
+  <div class="journey-dot active" onclick="navigate(0)" title="Home"></div>
+  <div class="journey-dot" onclick="navigate(1)" title="About"></div>
+  <div class="journey-dot" onclick="navigate(2)" title="VOLL Flights"></div>
+  <div class="journey-dot" onclick="navigate(3)" title="Next"></div>
+  <div class="journey-dot" onclick="navigate(4)" title="Contact"></div>
+  <span class="journey-label" id="journey-label">Home</span>
+</div>
+
+<!-- Scroll hint -->
+<div id="scroll-hint">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <path d="M8 3v10M4 9l4 4 4-4" stroke="rgba(245,230,200,0.6)" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+  <span data-en="Navigate" data-pt="Navegar">Navigate</span>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script>
+// ── State ──
+const sections = [
+  { id: 'home',    x: 700,  y: 900,  label: 'Home',         labelPt: 'Início',  nav: 0 },
+  { id: 'about',   x: 1400, y: 800,  label: 'About',        labelPt: 'Sobre',   nav: 1 },
+  { id: 'case1',   x: 2600, y: 860,  label: 'VOLL Flights', labelPt: 'VOLL',    nav: 2 },
+  { id: 'case2',   x: 3600, y: 840,  label: 'Coming soon',  labelPt: 'Em breve',nav: 3 },
+  { id: 'contact', x: 4500, y: 830,  label: 'Contact',      labelPt: 'Contato', nav: 4 },
+];
+
+let currentSection = 0;
+let currentLang = 'en';
+let isAnimating = false;
+
+const world = document.getElementById('world');
+const ship = document.getElementById('ship');
+const dots = document.querySelectorAll('.journey-dot');
+const journeyLabel = document.getElementById('journey-label');
+const navLinks = document.querySelectorAll('.nav-links a');
+
+// ── Camera ──
+function getCameraOffset(sectionIdx) {
+  const s = sections[sectionIdx];
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  return {
+    x: vw / 2 - s.x,
+    y: vh / 2 - s.y,
+  };
+}
+
+function navigate(idx) {
+  if (isAnimating || idx === currentSection) return;
+  isAnimating = true;
+
+  const prev = sections[currentSection];
+  const next = sections[idx];
+  currentSection = idx;
+
+  // Update nav
+  navLinks.forEach((a, i) => {
+    const navIdx = [0,1,2,4][i];
+    a.classList.toggle('active', navIdx === idx);
+  });
+
+  // Update dots
+  dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+
+  // Update label
+  journeyLabel.textContent = currentLang === 'pt'
+    ? sections[idx].labelPt
+    : sections[idx].label;
+
+  // Animate camera
+  const { x, y } = getCameraOffset(idx);
+  gsap.to(world, {
+    x, y,
+    duration: 1.8,
+    ease: 'power3.inOut',
+    onComplete: () => { isAnimating = false; }
+  });
+
+  // Move ship
+  gsap.to(ship, {
+    left: next.x,
+    top: next.y - 80,
+    duration: 1.6,
+    ease: 'power2.inOut',
+  });
+
+  // Show/hide sections
+  document.querySelectorAll('.map-section').forEach((el, i) => {
+    if (i === idx) {
+      gsap.fromTo(el, { opacity: 0, scale: 0.95 }, {
+        opacity: 1, scale: 1, duration: 0.5, delay: 0.9,
+        ease: 'power2.out',
+        onStart: () => el.classList.add('visible'),
+      });
+    } else {
+      el.classList.remove('visible');
+    }
+  });
+}
+
+// ── Init camera ──
+function initCamera() {
+  const { x, y } = getCameraOffset(0);
+  gsap.set(world, { x, y });
+  gsap.set(ship, { left: 700, top: 820 });
+}
+
+// ── Loader ──
+window.addEventListener('DOMContentLoaded', () => {
+  initCamera();
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hidden');
+    // Entrance animation for home section
+    gsap.fromTo('#home-section', { opacity: 0, y: 20 }, {
+      opacity: 1, y: 0, duration: 0.8, delay: 0.2, ease: 'power2.out'
+    });
+    document.querySelector('#home-section').classList.add('visible');
+  }, 1800);
+});
+
+// ── Keyboard navigation ──
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    if (currentSection < sections.length - 1) navigate(currentSection + 1);
+  }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    if (currentSection > 0) navigate(currentSection - 1);
+  }
+  if (e.key === 'Escape') closeCase();
+});
+
+// ── Wheel navigation ──
+let wheelThrottle = false;
+document.getElementById('viewport').addEventListener('wheel', e => {
+  if (wheelThrottle || document.getElementById('modal-overlay').classList.contains('open')) return;
+  wheelThrottle = true;
+  setTimeout(() => { wheelThrottle = false; }, 800);
+
+  if (e.deltaY > 0 || e.deltaX > 0) {
+    if (currentSection < sections.length - 1) navigate(currentSection + 1);
+  } else {
+    if (currentSection > 0) navigate(currentSection - 1);
+  }
+}, { passive: true });
+
+// ── Touch/swipe ──
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 60) {
+    if (dx < 0 && currentSection < sections.length - 1) navigate(currentSection + 1);
+    if (dx > 0 && currentSection > 0) navigate(currentSection - 1);
+  }
+}, { passive: true });
+
+// ── Custom cursor ──
+const cursor = document.getElementById('cursor');
+let curX = 0, curY = 0;
+document.addEventListener('mousemove', e => {
+  curX = e.clientX; curY = e.clientY;
+  cursor.style.transform = `translate(${curX - 6}px, ${curY - 6}px)`;
+});
+document.querySelectorAll('a, button, .journey-dot, .case-image-strip').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+});
+
+// ── Language toggle ──
+function toggleLang() {
+  currentLang = currentLang === 'en' ? 'pt' : 'en';
+  document.documentElement.lang = currentLang;
+  document.getElementById('lang-en').classList.toggle('active', currentLang === 'en');
+  document.getElementById('lang-pt').classList.toggle('active', currentLang === 'pt');
+
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const text = el.getAttribute(`data-${currentLang}`);
+    if (text) el.textContent = text;
+  });
+
+  // Update journey label
+  journeyLabel.textContent = currentLang === 'pt'
+    ? sections[currentSection].labelPt
+    : sections[currentSection].label;
+}
+
+// ── Case study modal ──
+function openCase(id) {
+  const overlay = document.getElementById('modal-overlay');
+  overlay.classList.add('open');
+  overlay.scrollTop = 0;
+  document.body.style.overflow = 'auto';
+}
+
+function closeCase() {
+  const overlay = document.getElementById('modal-overlay');
+  overlay.classList.remove('open');
+  document.body.style.overflow = 'hidden';
+}
+
+// ── Image strip drag scroll ──
+document.querySelectorAll('.case-image-strip').forEach(strip => {
+  let isDown = false, startX, scrollLeft;
+  strip.addEventListener('mousedown', e => {
+    isDown = true; strip.style.cursor = 'grabbing';
+    startX = e.pageX - strip.offsetLeft;
+    scrollLeft = strip.scrollLeft;
+  });
+  strip.addEventListener('mouseleave', () => { isDown = false; strip.style.cursor = 'grab'; });
+  strip.addEventListener('mouseup', () => { isDown = false; strip.style.cursor = 'grab'; });
+  strip.addEventListener('mousemove', e => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - strip.offsetLeft;
+    strip.scrollLeft = scrollLeft - (x - startX) * 1.5;
+  });
+});
+
+// ── Animate wave layers ──
+function createWaves() {
+  for (let i = 0; i < 8; i++) {
+    const el = document.createElement('div');
+    el.className = 'wave-layer';
+    el.style.top = `${Math.random() * 2800 + 100}px`;
+    el.style.animation = `wave-move ${4 + Math.random() * 4}s linear infinite`;
+    el.style.animationDelay = `${Math.random() * 4}s`;
+    document.getElementById('ocean-bg').appendChild(el);
+  }
+}
+createWaves();
+
+// Floating particles
+function createParticles() {
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.style.cssText = `
+      position:absolute;
+      width:2px; height:2px;
+      background:rgba(245,230,200,0.15);
+      border-radius:50%;
+      left:${Math.random() * 5200}px;
+      top:${Math.random() * 3000}px;
+      animation: float-particle ${6+Math.random()*8}s ease-in-out ${Math.random()*6}s infinite alternate;
+    `;
+    document.getElementById('ocean-bg').appendChild(p);
+  }
+}
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes float-particle {
+    from { transform: translateY(0) translateX(0); opacity: 0.1; }
+    to { transform: translateY(-30px) translateX(15px); opacity: 0.5; }
+  }
+`;
+document.head.appendChild(style);
+createParticles();
+
+// ── Window resize ──
+window.addEventListener('resize', () => {
+  const { x, y } = getCameraOffset(currentSection);
+  gsap.set(world, { x, y });
+});
+</script>
+</body>
+</html>
