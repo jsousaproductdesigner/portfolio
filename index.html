@@ -49,10 +49,20 @@ html, body {
   z-index: 9999;
   transform: translate(-24px, -30px);
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-  transition: transform 0.08s ease;
+  transition: transform 0.08s ease, width 0.3s ease, height 0.3s ease;
 }
 #cursor svg { width: 100%; height: 100%; }
 #cursor.hover { transform: translate(-24px, -30px) scale(1.2); }
+#cursor.x-mode {
+  width: 44px; height: 44px;
+  transform: translate(-22px, -22px);
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+}
+#cursor.x-mode.hover { transform: translate(-22px,-22px) scale(1.15); }
+#cursor-ship { display: block; }
+#cursor-x    { display: none; }
+#cursor.x-mode #cursor-ship { display: none; }
+#cursor.x-mode #cursor-x    { display: block; }
 
 /* ── Top Navigation ── */
 #nav {
@@ -124,12 +134,34 @@ html, body {
   width: 8000px; height: 3000px;
   transform-origin: 0 0;
   will-change: transform;
+  z-index: 1;
 }
 
-/* ── Ocean background ── */
-#ocean-bg {
-  position: absolute; inset: 0;
+/* ── Ocean background — fixed, never moves ── */
+#viewport {
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+  position: relative;
   background: var(--ocean);
+}
+#ocean-bg {
+  position: fixed; inset: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 38px,
+      rgba(255,255,255,0.025) 39px,
+      transparent 40px
+    ),
+    var(--ocean);
+  z-index: 0;
+  pointer-events: none;
+  animation: ocean-drift 12s linear infinite;
+}
+@keyframes ocean-drift {
+  from { background-position: 0 0; }
+  to   { background-position: 0 40px; }
 }
 
 /* Animated waves */
@@ -167,7 +199,7 @@ html, body {
   position: relative;
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: calc(100vh - 160px);
+  max-height: calc(100vh - 220px);
   box-shadow: 0 20px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.5);
   scrollbar-width: thin;
   scrollbar-color: var(--amber) transparent;
@@ -175,13 +207,6 @@ html, body {
 .panel::-webkit-scrollbar { width: 4px; }
 .panel::-webkit-scrollbar-track { background: transparent; }
 .panel::-webkit-scrollbar-thumb { background: var(--amber); border-radius: 2px; }
-.panel::before {
-  content: '';
-  position: sticky; top: 0; left: 0; right: 0;
-  height: 0;
-  pointer-events: none;
-  border-radius: inherit;
-}
 
 /* ── Ship (map layer) ── */
 #ship {
@@ -484,15 +509,16 @@ html, body {
   display: none;
   position: fixed; inset: 0;
   z-index: 2000;
-  background: rgba(6,12,24,0.95);
-  backdrop-filter: blur(4px);
+  background: var(--parchment);
   overflow-y: auto;
 }
 #modal-overlay.open { display: block; }
 #modal-content {
   max-width: 860px;
-  margin: 4rem auto;
+  margin: 0 auto;
   padding: 0 2rem 4rem;
+  background: var(--parchment);
+  color: var(--ink);
 }
 .modal-close {
   display: flex; align-items: center; gap: 0.5rem;
@@ -500,11 +526,11 @@ html, body {
   font-size: 0.7rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--parchment-dark);
+  color: var(--ink);
   background: none; border: none;
-  cursor: pointer; padding: 1rem 0;
-  opacity: 0.6; transition: opacity 0.2s;
-  margin-bottom: 2rem;
+  cursor: pointer; padding: 1.5rem 0;
+  opacity: 0.5; transition: opacity 0.2s;
+  margin-bottom: 1rem;
 }
 .modal-close:hover { opacity: 1; }
 .modal-header {
@@ -514,7 +540,7 @@ html, body {
   font-family: var(--font-display);
   font-size: 3.5rem;
   font-weight: 700;
-  color: var(--parchment);
+  color: var(--ink);
   line-height: 1.1;
   margin-bottom: 0.75rem;
 }
@@ -527,7 +553,7 @@ html, body {
 .modal-meta-row {
   display: flex; gap: 3rem; margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid rgba(245,230,200,0.15);
+  border-top: 1px solid rgba(42,31,14,0.15);
 }
 .modal-meta-item .label {
   font-size: 0.6rem; letter-spacing: 0.25em;
@@ -537,7 +563,7 @@ html, body {
 .modal-meta-item .value {
   font-family: var(--font-display);
   font-size: 0.95rem;
-  color: var(--parchment);
+  color: var(--ink);
 }
 .modal-section {
   margin-bottom: 3rem;
@@ -550,18 +576,18 @@ html, body {
 .modal-section-title {
   font-family: var(--font-display);
   font-size: 2rem;
-  color: var(--parchment);
+  color: var(--ink);
   margin-bottom: 1rem;
 }
 .modal-body {
   font-size: 1rem; line-height: 1.75;
-  color: rgba(245,230,200,0.8);
+  color: rgba(42,31,14,0.8);
 }
 .modal-img {
   width: 100%; border-radius: 4px;
   margin: 1.5rem 0;
   display: block;
-  border: 1px solid rgba(245,230,200,0.1);
+  border: 1px solid rgba(42,31,14,0.1);
 }
 .modal-outcomes-grid {
   display: grid; grid-template-columns: repeat(3, 1fr);
@@ -574,11 +600,11 @@ html, body {
 .modal-outcome-num {
   font-family: var(--font-display);
   font-size: 2.5rem; font-weight: 700;
-  color: var(--amber-light); line-height: 1;
+  color: var(--amber); line-height: 1;
   margin-bottom: 0.35rem;
 }
 .modal-outcome-label {
-  font-size: 0.75rem; color: rgba(245,230,200,0.6);
+  font-size: 0.75rem; color: rgba(42,31,14,0.6);
   line-height: 1.4;
 }
 .challenge-cards {
@@ -586,21 +612,21 @@ html, body {
   gap: 1rem; margin: 1.5rem 0;
 }
 .challenge-card {
-  background: rgba(245,230,200,0.05);
-  border: 1px solid rgba(245,230,200,0.1);
+  background: rgba(42,31,14,0.05);
+  border: 1px solid rgba(42,31,14,0.12);
   border-radius: 4px;
   padding: 1.25rem;
 }
 .challenge-card h4 {
   font-family: var(--font-display);
   font-size: 1rem;
-  color: var(--parchment);
+  color: var(--ink);
   margin-bottom: 0.5rem;
 }
 .challenge-card p {
   font-size: 0.8rem;
   line-height: 1.6;
-  color: rgba(245,230,200,0.6);
+  color: rgba(42,31,14,0.65);
 }
 
 /* ── Contact section ── */
@@ -609,19 +635,16 @@ html, body {
   padding: 3.5rem;
   text-align: center;
 }
-.x-mark {
-  font-family: var(--font-display);
-  font-size: 5rem;
-  font-weight: 700;
-  color: var(--red);
-  line-height: 1;
-  margin-bottom: 1rem;
+.x-mark-svg {
+  width: 100px; height: 100px;
   display: block;
-  animation: pulse-x 2s ease-in-out infinite;
+  margin: 0 auto 1.25rem;
+  animation: pulse-x 3s ease-in-out infinite;
+  filter: drop-shadow(2px 3px 6px rgba(100,20,10,0.3));
 }
 @keyframes pulse-x {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  0%, 100% { transform: scale(1) rotate(-2deg); }
+  50% { transform: scale(1.04) rotate(2deg); }
 }
 .contact-title {
   font-family: var(--font-display);
@@ -663,15 +686,16 @@ html, body {
 /* ── Progress / Journey indicator ── */
 #journey-progress {
   position: fixed;
-  bottom: 2rem; left: 50%;
+  bottom: 1.5rem; left: 50%;
   transform: translateX(-50%);
   display: flex; align-items: center; gap: 0.75rem;
   z-index: 500;
-  background: rgba(6,12,24,0.7);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(201,125,42,0.2);
+  background: rgba(6,12,24,0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(201,125,42,0.25);
   border-radius: 100px;
-  padding: 0.6rem 1.25rem;
+  padding: 0.5rem 1.25rem;
+  pointer-events: auto;
 }
 .journey-dot {
   width: 6px; height: 6px;
@@ -800,9 +824,10 @@ html, body {
   <div class="loader-bar"><div class="loader-bar-fill"></div></div>
 </div>
 
-<!-- Ship cursor -->
+<!-- Ship / X cursor -->
 <div id="cursor">
-  <svg viewBox="0 0 48 38" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ship (default) -->
+  <svg id="cursor-ship" viewBox="0 0 48 38" xmlns="http://www.w3.org/2000/svg">
     <path d="M6 28 Q14 36 24 37 Q34 36 42 28 L40 25 L8 25 Z" fill="#5a3a1a" stroke="#3a2010" stroke-width="0.8"/>
     <path d="M24 4 L24 24 L12 20 Z" fill="rgba(245,230,200,0.95)" stroke="rgba(201,125,42,0.6)" stroke-width="0.6"/>
     <path d="M24 8 L24 24 L34 21 Z" fill="rgba(245,230,200,0.78)" stroke="rgba(201,125,42,0.5)" stroke-width="0.6"/>
@@ -811,6 +836,16 @@ html, body {
     <circle cx="17" cy="29" r="2" fill="rgba(255,200,80,0.5)" stroke="#3a2010" stroke-width="0.4"/>
     <circle cx="31" cy="29" r="2" fill="rgba(255,200,80,0.5)" stroke="#3a2010" stroke-width="0.4"/>
     <path d="M8 34 Q16 36 24 35 Q32 36 40 34" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" fill="none" stroke-dasharray="3 2"/>
+  </svg>
+  <!-- X (contact section) -->
+  <svg id="cursor-x" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5 3 C9 8 18 18 22 22 C26 26 35 36 39 41" stroke="#1a1008" stroke-width="9" stroke-linecap="round" fill="none"/>
+    <path d="M39 3 C35 8 26 18 22 22 C18 26 9 36 5 41" stroke="#1a1008" stroke-width="9" stroke-linecap="round" fill="none"/>
+    <circle cx="5"  cy="3"  r="4.5" fill="#1a1008"/>
+    <circle cx="39" cy="41" r="4"   fill="#1a1008"/>
+    <circle cx="39" cy="3"  r="4.5" fill="#1a1008"/>
+    <circle cx="5"  cy="41" r="4"   fill="#1a1008"/>
+    <circle cx="22" cy="22" r="3.5" fill="#1a1008"/>
   </svg>
 </div>
 
@@ -1002,11 +1037,11 @@ html, body {
   <!-- ══════════ SECTION 2: VOLL FLIGHTS CASE ══════════ -->
   <div class="map-section" id="case1-section" style="left:3800px; top:975px;">
     <div class="panel case-card">
-      <div class="case-header">
-        <div class="case-meta">
+      <div class="case-header" style="padding:2rem 2.5rem 1.5rem;">
+        <div class="case-meta" style="margin-bottom:0.75rem;">
           <div class="case-meta-item">
             <div class="case-meta-label" data-en="Role" data-pt="Papel">Role</div>
-            <div class="case-meta-value" data-en="Product Designer" data-pt="Product Designer">Product Designer</div>
+            <div class="case-meta-value">Product Designer</div>
           </div>
           <div class="case-meta-item">
             <div class="case-meta-label" data-en="Timeline" data-pt="Duração">Timeline</div>
@@ -1017,11 +1052,11 @@ html, body {
             <div class="case-meta-value">Web & Mobile</div>
           </div>
         </div>
-        <h2 class="case-title">VOLL Flights</h2>
-        <p class="case-desc" data-en="Reduction of offline support and usability friction in a corporate travel flight booking platform — from search to reservation." data-pt="Redução de suporte offline e atrito de usabilidade em uma plataforma de reserva de passagens aéreas corporativas — da busca à reserva.">
-          Reduction of offline support and usability friction in a corporate travel flight booking platform — from search to reservation.
+        <h2 class="case-title" style="margin-bottom:0.5rem;">VOLL Flights</h2>
+        <p class="case-desc" style="margin-bottom:1.25rem; font-size:0.82rem;" data-en="Reducing offline support and usability friction in a corporate travel booking platform." data-pt="Redução de suporte offline e atrito de usabilidade em uma plataforma de reservas corporativas.">
+          Reducing offline support and usability friction in a corporate travel booking platform.
         </p>
-        <div class="case-outcomes">
+        <div class="case-outcomes" style="margin-bottom:0;">
           <div class="outcome">
             <div class="outcome-num">−82%</div>
             <div class="outcome-label" data-en="Offline bookings" data-pt="Reservas offline">Offline bookings</div>
@@ -1035,12 +1070,6 @@ html, body {
             <div class="outcome-label" data-en="Support tickets" data-pt="Tickets de suporte">Support tickets</div>
           </div>
         </div>
-      </div>
-      <div class="case-image-strip" id="strip1">
-        <img src="01_Section.png" alt="VOLL Flights web screens" loading="lazy">
-        <img src="07_Section.png" alt="User pains and business needs" loading="lazy">
-        <img src="12_Section.png" alt="Outcomes and results" loading="lazy">
-        <img src="mobile_screens.png" alt="VOLL Flights mobile screens" loading="lazy">
       </div>
       <div class="case-footer">
         <div class="case-tags">
@@ -1070,9 +1099,17 @@ html, body {
   <!-- ══════════ SECTION 4: CONTACT ══════════ -->
   <div class="map-section" id="contact-section" style="left:6800px; top:950px;">
     <div class="panel" id="contact-card">
-      <span class="x-mark">✕</span>
-      <h2 class="contact-title" data-en="Let's talk" data-pt="Vamos conversar">Let's talk</h2>
-      <p class="contact-sub" data-en="The treasure at the end of every map is a good conversation. Let's find yours." data-pt="O tesouro no fim de todo mapa é uma boa conversa. Vamos encontrar o seu.">
+      <svg class="x-mark-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 8 C18 15 35 35 55 55 C70 70 90 92 108 112" stroke="#1a1008" stroke-width="22" stroke-linecap="round" fill="none"/>
+        <path d="M108 8 C102 15 85 35 65 55 C50 70 30 92 12 112" stroke="#1a1008" stroke-width="22" stroke-linecap="round" fill="none"/>
+        <circle cx="12" cy="8" r="11" fill="#1a1008"/>
+        <circle cx="108" cy="112" r="10" fill="#1a1008"/>
+        <circle cx="108" cy="8" r="11" fill="#1a1008"/>
+        <circle cx="12" cy="112" r="10" fill="#1a1008"/>
+        <circle cx="60" cy="60" r="8" fill="#1a1008"/>
+      </svg>
+      <h2 class="contact-title" data-en="You made it. Let's talk?" data-pt="Você chegou. Vamos conversar?">You made it. Let's talk?</h2>
+      <p class="contact-sub" data-en="The treasure at the end of every map is a good conversation. Let's find yours." data-pt="O tesouro no fim de todo mapa é uma boa conversa. Vamos encontrar a sua.">
         The treasure at the end of every map is a good conversation. Let's find yours.
       </p>
       <div class="contact-links">
@@ -1138,8 +1175,8 @@ html, body {
         </div>
       </div>
 
-      <!-- Cover -->
-      <img src="cover.png" class="modal-img" alt="VOLL Flights cover">
+      <!-- First real screenshot -->
+      <img src="01_Section.png" class="modal-img" alt="VOLL Flights screens">
 
       <!-- Section 01: Context -->
       <div class="modal-section">
@@ -1265,12 +1302,12 @@ html, body {
 </div>
 
 <!-- Nav arrows -->
-<button class="nav-arrow" id="nav-prev" onclick="navigate(currentSection-1)" title="Previous">
+<button class="nav-arrow" id="nav-prev" onclick="navigateByCamera(-1)" title="Previous">
   <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <polyline points="15 18 9 12 15 6"/>
   </svg>
 </button>
-<button class="nav-arrow" id="nav-next" onclick="navigate(currentSection+1)" title="Next">
+<button class="nav-arrow" id="nav-next" onclick="navigateByCamera(1)" title="Next">
   <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <polyline points="9 18 15 12 9 6"/>
   </svg>
@@ -1302,13 +1339,15 @@ function getCameraOffset(sectionIdx) {
   const s = sections[sectionIdx];
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  const navH = 72; // top nav height
-  const shipH = 60; // ship above card
-  // Center the card in the available space below nav
-  const availH = vh - navH;
+  // Ship occupies 76px above card top (shipH 56 + 20px gap)
+  // Card top on screen should be at: navH + shipH = 72 + 76 = 148px
+  // This puts ship flush under nav bar and card right below ship
+  const cardTopOnScreen = 148;
+  // Card max-height accounts for dots bar below
+  // Center x on section
   return {
     x: vw / 2 - s.x,
-    y: navH + availH / 2 - s.y - shipH,
+    y: cardTopOnScreen - s.y,
   };
 }
 
@@ -1316,7 +1355,7 @@ function navigate(idx) {
   if (isAnimating || idx === currentSection) return;
   isAnimating = true;
 
-  const prev = sections[currentSection];
+  const fromSection = sections[currentSection];
   const next = sections[idx];
   currentSection = idx;
 
@@ -1336,6 +1375,9 @@ function navigate(idx) {
 
   updateArrows();
 
+  // Switch cursor: X on contact section, ship everywhere else
+  document.getElementById('cursor').classList.toggle('x-mode', idx === sections.length - 1);
+
   // Animate camera
   const { x, y } = getCameraOffset(idx);
   gsap.to(world, {
@@ -1345,12 +1387,21 @@ function navigate(idx) {
     onComplete: () => { isAnimating = false; }
   });
 
-  // Move ship to top of active card
+  // Hide map ship on contact (cursor is the X)
+  ship.style.opacity = idx === sections.length - 1 ? '0' : '1';
+
+  // Move ship along arc (midpoint elevated above both islands)
+  const midX = (fromSection.x + next.x) / 2;
+  const midY = getPathY(midX) - 80; // arc peak above path
   gsap.to(ship, {
-    left: next.x,
-    top: next.y - 20,
-    duration: 1.6,
-    ease: 'power2.inOut',
+    left: midX, top: midY,
+    duration: 0.8, ease: 'power1.in',
+    onComplete: () => {
+      gsap.to(ship, {
+        left: next.x, top: getPathY(next.x),
+        duration: 0.8, ease: 'power1.out',
+      });
+    }
   });
 }
 
@@ -1358,7 +1409,38 @@ function navigate(idx) {
 function initCamera() {
   const { x, y } = getCameraOffset(0);
   gsap.set(world, { x, y });
-  gsap.set(ship, { left: 800, top: 910 });
+  gsap.set(ship, { left: 800, top: getPathY(800) });
+}
+
+// ── Ship follows path during drag — accurate bezier calculation ──
+const PATH_SEGMENTS = [
+  [{x:800,y:900}, {x:1400,y:700}, {x:2200,y:870}],
+  [{x:2200,y:870}, {x:2900,y:1050},{x:3800,y:920}],
+  [{x:3800,y:920}, {x:4500,y:800}, {x:5400,y:900}],
+  [{x:5400,y:900}, {x:6000,y:980}, {x:6800,y:900}],
+];
+
+function bezierPt(t, p0, p1, p2) {
+  const m = 1 - t;
+  return {
+    x: m*m*p0.x + 2*m*t*p1.x + t*t*p2.x,
+    y: m*m*p0.y + 2*m*t*p1.y + t*t*p2.y,
+  };
+}
+
+function getPathY(worldX) {
+  for (const [p0, p1, p2] of PATH_SEGMENTS) {
+    if (worldX >= p0.x && worldX <= p2.x) {
+      // Binary search for t where bezierPt(t).x ≈ worldX
+      let lo = 0, hi = 1;
+      for (let i = 0; i < 24; i++) {
+        const mid = (lo + hi) / 2;
+        bezierPt(mid, p0, p1, p2).x < worldX ? lo = mid : hi = mid;
+      }
+      return bezierPt((lo + hi) / 2, p0, p1, p2).y;
+    }
+  }
+  return worldX < 800 ? 900 : 900;
 }
 
 // ── Drag to pan ──
@@ -1386,12 +1468,22 @@ window.addEventListener('mousemove', e => {
   const dx = e.clientX - dragStartX;
   const dy = e.clientY - dragStartY;
   if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragMoved = true;
-  gsap.set(world, { x: worldStartX + dx, y: worldStartY + dy });
+  const newWorldX = worldStartX + dx;
+  const newWorldY = worldStartY + dy;
+  gsap.set(world, { x: newWorldX, y: newWorldY });
+
+  // Ship follows path at screen-center X — bottom of ship ON the line
+  const shipWorldX = window.innerWidth / 2 - newWorldX;
+  const shipWorldY = getPathY(shipWorldX);
+  if (ship.style.opacity !== '0') {
+    gsap.set(ship, { left: shipWorldX, top: shipWorldY });
+  }
 });
 
 window.addEventListener('mouseup', () => {
   isDragging = false;
   vp.style.cursor = '';
+  updateArrows();
 });
 
 // ── Loader ──
@@ -1444,10 +1536,41 @@ document.querySelectorAll('a, button, .journey-dot, .case-image-strip').forEach(
   el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
 });
 
-// ── Update nav arrows state ──
+// ── Update nav arrows by camera position (not ship position) ──
 function updateArrows() {
-  document.getElementById('nav-prev').classList.toggle('disabled', currentSection === 0);
-  document.getElementById('nav-next').classList.toggle('disabled', currentSection === sections.length - 1);
+  // Find which section is closest to current camera center
+  const m = new DOMMatrix(getComputedStyle(world).transform);
+  const camX = m.m41; // world offset x
+  const screenCenterX = window.innerWidth / 2;
+  // World x that's at screen center = screenCenterX - camX
+  const viewCenterWorldX = screenCenterX - camX;
+
+  // Find nearest section to current view center
+  let nearestIdx = 0;
+  let minDist = Infinity;
+  sections.forEach((s, i) => {
+    const d = Math.abs(s.x - viewCenterWorldX);
+    if (d < minDist) { minDist = d; nearestIdx = i; }
+  });
+
+  document.getElementById('nav-prev').classList.toggle('disabled', nearestIdx === 0);
+  document.getElementById('nav-next').classList.toggle('disabled', nearestIdx === sections.length - 1);
+}
+
+function navigateByCamera(dir) {
+  // Find nearest section to current camera view, then go dir from it
+  const m = new DOMMatrix(getComputedStyle(world).transform);
+  const viewCenterWorldX = window.innerWidth / 2 - m.m41;
+
+  let nearestIdx = 0;
+  let minDist = Infinity;
+  sections.forEach((s, i) => {
+    const d = Math.abs(s.x - viewCenterWorldX);
+    if (d < minDist) { minDist = d; nearestIdx = i; }
+  });
+
+  const target = nearestIdx + dir;
+  if (target >= 0 && target < sections.length) navigate(target);
 }
 
 // ── Language toggle ──
