@@ -6,7 +6,8 @@
 <title>José Araujo — Product Designer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=IM+Fell+English:ital@1&display=swap" rel="stylesheet">
+<link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js">
 
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -31,6 +32,12 @@
   --font-fell: 'IM Fell English', Georgia, serif;
   --font-body: 'DM Sans', system-ui, sans-serif;
   --transition: cubic-bezier(0.76, 0, 0.24, 1);
+  /* ── Radius scale ── */
+  --r-sm:   8px;
+  --r-md:  14px;
+  --r-lg:  20px;
+  --r-xl:  24px;
+  --r-pill: 100px;
 }
 
 html, body {
@@ -64,12 +71,11 @@ html, body {
 #cursor.x-mode #cursor-ship { display: none; }
 #cursor.x-mode #cursor-x    { display: block; }
 
-/* ── Top Navigation ── */
 #nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
   display: flex; align-items: center; justify-content: space-between;
   padding: 1.5rem 2.5rem;
-  background: linear-gradient(to bottom, rgba(6,12,24,0.95), transparent);
+  background: linear-gradient(to bottom, rgba(6,12,24,0.92) 70%, transparent);
 }
 
 .nav-logo {
@@ -164,6 +170,14 @@ html, body {
   to   { background-position: 0 40px; }
 }
 
+/* ── Language visibility ── */
+[data-lang="en"] .pt-only { display: none; }
+[data-lang="pt"] .en-only { display: none; }
+
+/* ── Perf hints ── */
+#world { contain: layout; }
+#modal-overlay { contain: layout paint; }
+
 /* Animated waves */
 .wave-layer {
   position: absolute; left: 0; right: 0;
@@ -195,9 +209,7 @@ html, body {
 .panel {
   background: var(--parchment);
   color: var(--ink);
-  border-radius: 3px;
-  position: relative;
-  overflow-y: auto;
+  border-radius: var(--r-xl);
   overflow-x: hidden;
   max-height: calc(100vh - 220px);
   box-shadow: 0 20px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.5);
@@ -206,7 +218,7 @@ html, body {
 }
 .panel::-webkit-scrollbar { width: 4px; }
 .panel::-webkit-scrollbar-track { background: transparent; }
-.panel::-webkit-scrollbar-thumb { background: var(--amber); border-radius: 2px; }
+.panel::-webkit-scrollbar-thumb { background: var(--amber); border-radius: var(--r-sm); }
 
 /* ── Ship (map layer) ── */
 #ship {
@@ -316,7 +328,7 @@ html, body {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
-  border-radius: 2px;
+  border-radius: var(--r-md);
   transition: background 0.2s, transform 0.15s;
   cursor: pointer; border: none;
 }
@@ -333,7 +345,7 @@ html, body {
   text-transform: uppercase;
   text-decoration: none;
   border: 1.5px solid var(--ink);
-  border-radius: 2px;
+  border-radius: var(--r-md);
   transition: all 0.2s;
   cursor: pointer;
 }
@@ -373,6 +385,7 @@ html, body {
 .xp-item {
   border-left: 2px solid var(--amber);
   padding-left: 1rem;
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
 }
 .xp-role {
   font-family: var(--font-display);
@@ -404,7 +417,7 @@ html, body {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   padding: 0.3rem 0.75rem;
-  border-radius: 100px;
+  border-radius: var(--r-sm);
 }
 
 /* ── Case Study Card ── */
@@ -454,7 +467,7 @@ html, body {
   background: var(--ink);
   color: var(--parchment);
   padding: 1rem 1.25rem;
-  border-radius: 2px;
+  border-radius: var(--r-lg);
 }
 .outcome-num {
   font-family: var(--font-display);
@@ -468,23 +481,54 @@ html, body {
   letter-spacing: 0.08em;
   opacity: 0.7;
 }
-.case-image-strip {
-  display: flex; overflow-x: auto; gap: 0;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  cursor: grab;
-  border-top: 2px solid var(--parchment-dark);
+/* ── Modal case section layouts ── */
+.ms-split {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2rem; align-items: start; margin: 1.5rem 0;
 }
-.case-image-strip:active { cursor: grabbing; }
-.case-image-strip img {
-  width: 100%; min-width: 780px;
-  height: 300px;
-  object-fit: cover;
-  object-position: top;
-  scroll-snap-align: start;
-  flex-shrink: 0;
-  display: block;
+.ms-split-wide { grid-template-columns: 3fr 2fr; }
+.ms-text { }
+.ms-highlights {
+  display: grid; gap: 0.75rem; margin: 1.25rem 0;
 }
+.ms-highlight {
+  background: rgba(42,31,14,0.05);
+  border-left: 3px solid var(--amber);
+  padding: 0.85rem 1rem;
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+}
+.ms-highlight strong {
+  display: block; font-family: var(--font-display);
+  font-size: 0.9rem; color: var(--ink); margin-bottom: 0.25rem;
+}
+.ms-highlight span { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+.ms-stat-row {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 1rem; margin: 1.25rem 0;
+}
+.ms-stat {
+  border-top: 2px solid var(--amber); padding-top: 0.75rem;
+  background: rgba(42,31,14,0.04);
+  border-radius: 0 0 var(--r-md) var(--r-md);
+  padding: 0.75rem 1rem 0.75rem;
+  border: 1px solid rgba(42,31,14,0.08);
+  border-top: 2px solid var(--amber);
+}
+.ms-stat-num {
+  font-family: var(--font-display); font-size: 1.8rem;
+  font-weight: 700; color: var(--amber); line-height: 1;
+}
+.ms-stat-label { font-size: 0.7rem; color: var(--muted); margin-top: 0.2rem; }
+.ms-phase-pills {
+  display: flex; gap: 0.75rem; margin: 1rem 0;
+}
+.ms-pill {
+  padding: 0.4rem 1rem; border-radius: 100px; font-size: 0.7rem;
+  font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.ms-pill-active { background: var(--amber); color: var(--ink); }
+.ms-pill-done { background: rgba(201,125,42,0.15); color: var(--amber); }
+.ms-pill-inactive { background: rgba(42,31,14,0.08); color: var(--muted); }
 .case-footer {
   padding: 1.5rem 3rem;
   display: flex; align-items: center; justify-content: space-between;
@@ -500,7 +544,7 @@ html, body {
   color: var(--muted);
   background: rgba(42,31,14,0.06);
   padding: 0.25rem 0.6rem;
-  border-radius: 100px;
+  border-radius: var(--r-sm);
   border: 1px solid rgba(42,31,14,0.1);
 }
 
@@ -584,7 +628,7 @@ html, body {
   color: rgba(42,31,14,0.8);
 }
 .modal-img {
-  width: 100%; border-radius: 4px;
+  width: 100%; border-radius: var(--r-lg);
   margin: 1.5rem 0;
   display: block;
   border: 1px solid rgba(42,31,14,0.1);
@@ -595,7 +639,11 @@ html, body {
 }
 .modal-outcome {
   border-top: 2px solid var(--amber);
-  padding-top: 1rem;
+  padding: 1rem;
+  background: rgba(42,31,14,0.04);
+  border-radius: 0 0 var(--r-md) var(--r-md);
+  border: 1px solid rgba(42,31,14,0.08);
+  border-top: 2px solid var(--amber);
 }
 .modal-outcome-num {
   font-family: var(--font-display);
@@ -614,7 +662,7 @@ html, body {
 .challenge-card {
   background: rgba(42,31,14,0.05);
   border: 1px solid rgba(42,31,14,0.12);
-  border-radius: 4px;
+  border-radius: var(--r-md);
   padding: 1.25rem;
 }
 .challenge-card h4 {
@@ -672,7 +720,7 @@ html, body {
   font-weight: 500;
   padding: 0.85rem;
   border: 1.5px solid rgba(42,31,14,0.2);
-  border-radius: 2px;
+  border-radius: var(--r-md);
   transition: all 0.2s;
 }
 .contact-link:hover {
@@ -739,10 +787,10 @@ html, body {
 #nav-next { right: 1.25rem; }
 .nav-arrow svg { width: 22px; height: 22px; stroke: var(--parchment); }
 
-/* ── Wave animations (decorative) ── */
-@keyframes wave-move {
+/* ── Wave animations (ocean background CSS only) ── */
+@keyframes ocean-drift {
   from { background-position: 0 0; }
-  to { background-position: 80px 0; }
+  to   { background-position: 0 40px; }
 }
 
 /* ── Loading screen ── */
@@ -769,13 +817,15 @@ html, body {
   opacity: 0.7;
 }
 .loader-bar {
-  width: 200px; height: 1px;
+  width: 200px; height: 4px;
   background: rgba(245,230,200,0.15);
+  border-radius: var(--r-pill);
   margin-top: 2rem; position: relative; overflow: hidden;
 }
 .loader-bar-fill {
   position: absolute; left: 0; top: 0; bottom: 0;
   background: var(--amber);
+  border-radius: var(--r-pill);
   animation: fill-bar 1.6s ease-in-out forwards;
 }
 @keyframes fill-bar { from { width: 0; } to { width: 100%; } }
@@ -924,11 +974,11 @@ html, body {
     </g>
 
     <!-- Island labels -->
-    <text x="800"  y="850" text-anchor="middle" font-family="'IM Fell English',serif" font-size="13" fill="rgba(245,230,200,0.4)" font-style="italic">Ilha de Partida</text>
-    <text x="2200" y="750" text-anchor="middle" font-family="'IM Fell English',serif" font-size="12" fill="rgba(245,230,200,0.35)" font-style="italic">Ilha do Navegante</text>
-    <text x="3800" y="845" text-anchor="middle" font-family="'IM Fell English',serif" font-size="13" fill="rgba(245,230,200,0.35)" font-style="italic">Ilha dos Casos</text>
-    <text x="5400" y="810" text-anchor="middle" font-family="'IM Fell English',serif" font-size="11" fill="rgba(245,230,200,0.28)" font-style="italic">Terra Incógnita</text>
-    <text x="6800" y="830" text-anchor="middle" font-family="'IM Fell English',serif" font-size="13" fill="rgba(245,230,200,0.4)" font-style="italic">Ilha do Tesouro</text>
+    <text x="800"  y="830" text-anchor="middle" font-family="'IM Fell English',serif" font-size="24" fill="rgba(245,230,200,0.55)" font-style="italic">Ilha de Partida</text>
+    <text x="2200" y="720" text-anchor="middle" font-family="'IM Fell English',serif" font-size="22" fill="rgba(245,230,200,0.5)"  font-style="italic">Ilha do Navegante</text>
+    <text x="3800" y="820" text-anchor="middle" font-family="'IM Fell English',serif" font-size="24" fill="rgba(245,230,200,0.5)"  font-style="italic">Ilha dos Casos</text>
+    <text x="5400" y="785" text-anchor="middle" font-family="'IM Fell English',serif" font-size="20" fill="rgba(245,230,200,0.4)"  font-style="italic">Terra Incógnita</text>
+    <text x="6800" y="805" text-anchor="middle" font-family="'IM Fell English',serif" font-size="24" fill="rgba(245,230,200,0.55)" font-style="italic">Ilha do Tesouro</text>
 
   </svg>
 
@@ -1186,261 +1236,250 @@ html, body {
     <!-- VOLL Case Study Content -->
     <div id="case-voll">
       <div class="modal-header">
-        <div style="font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--amber); margin-bottom:0.75rem;">Case Study · 2024</div>
+        <div style="font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--amber);margin-bottom:0.75rem;">Case Study · 2024–2025</div>
         <h1 class="modal-title">VOLL Flights</h1>
-        <p class="modal-subtitle" data-en="Reduction of offline support and usability friction" data-pt="Redução de suporte offline e atrito de usabilidade">
-          Reduction of offline support and usability friction
-        </p>
+        <p class="modal-subtitle" data-en="Reducing offline support and usability friction" data-pt="Reduzindo suporte offline e atrito de usabilidade">Reducing offline support and usability friction</p>
         <div class="modal-meta-row">
-          <div class="modal-meta-item">
-            <div class="label" data-en="Role" data-pt="Papel">Role</div>
-            <div class="value">Product Designer</div>
-          </div>
-          <div class="modal-meta-item">
-            <div class="label" data-en="Timeline" data-pt="Duração">Timeline</div>
-            <div class="value" data-en="2 months" data-pt="2 meses">2 months</div>
-          </div>
-          <div class="modal-meta-item">
-            <div class="label">Platform</div>
-            <div class="value">Web & Mobile (Flutter)</div>
-          </div>
-          <div class="modal-meta-item">
-            <div class="label">Company</div>
-            <div class="value">VOLL</div>
-          </div>
+          <div class="modal-meta-item"><div class="label" data-en="Role" data-pt="Papel">Role</div><div class="value">Product Designer</div></div>
+          <div class="modal-meta-item"><div class="label" data-en="Timeline" data-pt="Duração">Timeline</div><div class="value" data-en="2 months" data-pt="2 meses">2 months</div></div>
+          <div class="modal-meta-item"><div class="label">Platform</div><div class="value">Web & Mobile (Flutter)</div></div>
+          <div class="modal-meta-item"><div class="label" data-en="Company" data-pt="Empresa">Company</div><div class="value">VOLL</div></div>
         </div>
       </div>
 
-      <!-- First real screenshot -->
-      <img src="01_Section.png" class="modal-img" alt="VOLL Flights screens">
-
-      <!-- Section 01: Context -->
       <div class="modal-section">
-        <div class="modal-section-label">Context</div>
-        <h2 class="modal-section-title" data-en="Corporate travel, real friction" data-pt="Viagem corporativa, atrito real">Corporate travel, real friction</h2>
-        <p class="modal-body" data-en="VOLL is a corporate travel platform serving companies across Brazil. After nearly 2 years since launching the air ticket product, feedback and operational data revealed critical usability problems costing the business." data-pt="VOLL é uma plataforma de viagens corporativas. Após quase 2 anos do produto de passagens aéreas, feedbacks e dados revelaram problemas críticos de usabilidade que custavam ao negócio.">
-          VOLL is a corporate travel platform serving companies across Brazil. After nearly 2 years since launching the air ticket product, feedback and operational data revealed critical usability problems costing the business.
-        </p>
-        <img src="01_Section.png" class="modal-img" alt="Context">
-      </div>
-
-      <!-- Section 02: Context detail -->
-      <img src="02_Section.png" class="modal-img" alt="Context detail">
-
-      <!-- Section 04: Challenge & Goals -->
-      <div class="modal-section">
-        <div class="modal-section-label" data-en="Challenge & Goals" data-pt="Desafio & Objetivos">Challenge & Goals</div>
-        <h2 class="modal-section-title" data-en="Three pillars to redesign" data-pt="Três pilares do redesign">Three pillars to redesign</h2>
-        <div class="challenge-cards">
-          <div class="challenge-card">
-            <h4 data-en="Less friction" data-pt="Menos atrito">Less friction</h4>
-            <p data-en="Users selecting flights without knowing the total cost until the end of the flow." data-pt="Usuários selecionando voos sem saber o custo total até o fim do fluxo.">Users selecting flights without knowing the total cost until the end of the flow.</p>
+        <div class="modal-section-label" data-en="Context" data-pt="Contexto">Context</div>
+        <div class="ms-split ms-split-wide">
+          <div class="ms-text">
+            <h2 class="modal-section-title" data-en="Corporate travel management platform" data-pt="Plataforma de gestão de viagens corporativas">Corporate travel management platform</h2>
+            <p class="modal-body en-only">VOLL offers Car Rentals, Urban Mobility, Accommodation, and Air Tickets to Brazilian companies. After two years since launch, user feedback and support logs revealed critical usability gaps — problems directly costing the business in offline support volume.</p>
+            <p class="modal-body pt-only">A VOLL oferece Aluguel de Carros, Mobilidade Urbana, Hospedagem e Passagens Aéreas para empresas brasileiras. Após dois anos do lançamento, feedbacks e logs de suporte revelaram lacunas críticas de usabilidade — problemas que custavam diretamente ao negócio em volume de suporte offline.</p>
           </div>
-          <div class="challenge-card">
-            <h4 data-en="Better backend" data-pt="Backend melhorado">Better backend</h4>
-            <p data-en="System couldn't map all round-trip fares during search — reducing options and increasing load time." data-pt="O sistema não conseguia mapear todas as tarifas de ida e volta durante a busca.">System couldn't map all round-trip fares during search — reducing options and increasing load time.</p>
-          </div>
-          <div class="challenge-card">
-            <h4 data-en="Market alignment" data-pt="Alinhamento de mercado">Market alignment</h4>
-            <p data-en="Language and interface didn't match modern airline booking tools users were already accustomed to." data-pt="A linguagem e interface não correspondiam às ferramentas de reserva modernas que os usuários já usavam.">Language and interface didn't match modern airline booking tools users were already accustomed to.</p>
-          </div>
-        </div>
-        <img src="04_Section.png" class="modal-img" alt="Challenge and Goals">
-      </div>
-
-      <!-- Section 05: Previous experience + Solution part 1 -->
-      <div class="modal-section">
-        <div class="modal-section-label" data-en="Discovery" data-pt="Descoberta">Discovery</div>
-        <h2 class="modal-section-title" data-en="The previous experience" data-pt="A experiência anterior">The previous experience</h2>
-        <img src="05_Section.png" class="modal-img" alt="Previous experience and solution part 1">
-      </div>
-
-      <!-- Section 06: Final design -->
-      <div class="modal-section">
-        <div class="modal-section-label" data-en="Solution" data-pt="Solução">Solution</div>
-        <h2 class="modal-section-title" data-en="Final design" data-pt="Design final">Final design</h2>
-        <img src="06_Section.png" class="modal-img" alt="Final design">
-      </div>
-
-      <!-- Section 07: User pains & Business needs -->
-      <div class="modal-section">
-        <div class="modal-section-label" data-en="Research" data-pt="Pesquisa">Research</div>
-        <h2 class="modal-section-title" data-en="At least 15% chose offline support" data-pt="Pelo menos 15% escolheram o suporte offline">At least 15% chose offline support</h2>
-        <p class="modal-body" data-en="The experience generated enough confusion that at least 15% of users abandoned the platform and resorted to calling support — directly costing the business." data-pt="A experiência gerava confusão suficiente para que pelo menos 15% dos usuários abandonassem a plataforma e ligassem para o suporte — custando diretamente ao negócio.">
-          The experience generated enough confusion that at least 15% of users abandoned the platform and resorted to calling support — directly costing the business.
-        </p>
-        <img src="07_Section.png" class="modal-img" alt="User pains and business needs">
-      </div>
-
-      <!-- Section 09: Usability tests -->
-      <div class="modal-section">
-        <div class="modal-section-label" data-en="Testing" data-pt="Testes">Testing</div>
-        <h2 class="modal-section-title" data-en="Moderated + Maze testing" data-pt="Testes moderados + Maze">Moderated + Maze testing</h2>
-        <p class="modal-body" data-en="Moderated sessions via Google Meet with 5 participants, plus async tests via Maze. Tasks covered flight search, outbound selection, return selection, and fare comparison." data-pt="Sessões moderadas via Google Meet com 5 participantes, mais testes assíncronos via Maze. As tarefas cobriam busca de voos, seleção de ida, volta e comparação de tarifas.">
-          Moderated sessions via Google Meet with 5 participants, plus async tests via Maze. Tasks covered flight search, outbound selection, return selection, and fare comparison.
-        </p>
-        <img src="09_Section.png" class="modal-img" alt="Usability tests">
-      </div>
-
-      <!-- Section 10: Test results - calendar & return flights -->
-      <div class="modal-section">
-        <div class="modal-section-label" data-en="Test results" data-pt="Resultados dos testes">Test results</div>
-        <h2 class="modal-section-title" data-en="Two critical friction points" data-pt="Dois pontos críticos de atrito">Two critical friction points</h2>
-        <img src="10_Section.png" class="modal-img" alt="Test results - date selection and return flights">
-      </div>
-
-      <!-- Section 11: Maze results -->
-      <img src="11_Section.png" class="modal-img" alt="Maze test results">
-
-      <!-- Section 12: Outcomes -->
-      <div class="modal-section">
-        <div class="modal-section-label" data-en="Outcomes" data-pt="Resultados">Outcomes</div>
-        <h2 class="modal-section-title" data-en="From 14% offline to 2.4%" data-pt="De 14% offline para 2,4%">From 14% offline to 2.4%</h2>
-        <div class="modal-outcomes-grid">
-          <div class="modal-outcome">
-            <div class="modal-outcome-num">82.37</div>
-            <div class="modal-outcome-label">NPS (from 78.6) · H2 2025</div>
-          </div>
-          <div class="modal-outcome">
-            <div class="modal-outcome-num">−82%</div>
-            <div class="modal-outcome-label" data-en="Offline bookings (14% → 2.4%)" data-pt="Reservas offline (14% → 2,4%)">Offline bookings (14% → 2.4%)</div>
-          </div>
-          <div class="modal-outcome">
-            <div class="modal-outcome-num">−41%</div>
-            <div class="modal-outcome-label" data-en="Support tickets per transaction" data-pt="Tickets por transação">Support tickets per transaction</div>
-          </div>
-        </div>
-        <img src="12_Section.png" class="modal-img" alt="Outcomes charts">
-      </div>
-
-      <!-- Section 14: Final screens / thanks -->
-      <img src="14_Section.png" class="modal-img" alt="Final screens">
-
-      <!-- Mobile screens -->
-      <div class="modal-section">
-        <div class="modal-section-label">Mobile · Flutter</div>
-        <h2 class="modal-section-title" data-en="Web & Mobile" data-pt="Web & Mobile">Web & Mobile</h2>
-        <img src="mobile_screens.png" class="modal-img" alt="Mobile screens">
-      </div>
-
-    </div><!-- /case-voll -->
-
-    <!-- ══════════ DORIS WIDGET CASE ══════════ -->
-    <div id="case-doris" style="display:none;">
-      <div class="modal-header">
-        <div style="font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--amber); margin-bottom:0.75rem;">Case Study · 2021–2024</div>
-        <h1 class="modal-title">Doris Widget</h1>
-        <p class="modal-subtitle" data-en="Increasing feature adoption for a virtual try-on tool" data-pt="Aumentando a adoção de um widget de prova virtual">
-          Increasing feature adoption for a virtual try-on tool
-        </p>
-        <div class="modal-meta-row">
-          <div class="modal-meta-item">
-            <div class="label">Role</div>
-            <div class="value">Lead Product Designer</div>
-          </div>
-          <div class="modal-meta-item">
-            <div class="label" data-en="Timeline" data-pt="Duração">Timeline</div>
-            <div class="value">3 years</div>
-          </div>
-          <div class="modal-meta-item">
-            <div class="label">Platform</div>
-            <div class="value">Mobile · E-commerce</div>
-          </div>
-          <div class="modal-meta-item">
-            <div class="label">Company</div>
-            <div class="value">Doris</div>
-          </div>
+          <img src="01_Section.png" class="modal-img" style="margin:0;align-self:center;" loading="lazy" decoding="async" alt="VOLL Flights UI">
         </div>
       </div>
 
-      <!-- Context -->
-      <div class="modal-section">
-        <div class="modal-section-label">Context</div>
-        <h2 class="modal-section-title">A Brazilian startup rethinking how people shop online</h2>
-        <p class="modal-body">Doris is a Brazilian startup focused on retail innovation — allowing customers to virtually try on e-commerce clothes using user-centered design. The product lives as a widget embedded in the product page of partner stores like Reserva.</p>
-        <img src="doris_02.jpg" class="modal-img" alt="Doris context — virtual try-on">
-        <img src="doris_03.jpg" class="modal-img" alt="Doris context — 2 full-body photos">
-      </div>
-
-      <!-- Problem -->
       <div class="modal-section">
         <div class="modal-section-label" data-en="The problem" data-pt="O problema">The problem</div>
-        <h2 class="modal-section-title">Only 1.2% completed the task after launch</h2>
-        <p class="modal-body">User tests and interviews couldn't predict that users' real-world contexts — time and place — would be a significant barrier to taking the two required full-body photos. After launch, the data confirmed the gap: activation was happening, but completion wasn't.</p>
-        <img src="doris_04.jpg" class="modal-img" alt="The problem — 1.2% completion rate">
-      </div>
-
-      <!-- Objective -->
-      <div class="modal-section">
-        <div class="modal-section-label" data-en="Objective" data-pt="Objetivo">Objective</div>
-        <h2 class="modal-section-title">From 1.2% to at least 5% — without breaking revenue</h2>
-        <p class="modal-body">The goal was to research, run squad workshops to form strong hypotheses, then design simple, fast tests to increase main flow usage from 1.2% to at least 5% — without compromising, and possibly increasing, the revenue stream.</p>
-        <img src="doris_05.jpg" class="modal-img" alt="The objective">
-      </div>
-
-      <!-- Process overview -->
-      <div class="modal-section">
-        <div class="modal-section-label" data-en="Process" data-pt="Processo">Process</div>
-        <h2 class="modal-section-title">Three-phase approach: Empathise → Conceptualise → Design</h2>
-        <img src="doris_06.jpg" class="modal-img" alt="Process overview">
-      </div>
-
-      <!-- Phase 1: Empathise -->
-      <div class="modal-section">
-        <div class="modal-section-label">1. Empathise</div>
-        <h2 class="modal-section-title">No access to real users — so we used our own data</h2>
-        <p class="modal-body">Without direct access to users at this stage, we analyzed existing data to extract insights: main drop-off moments, screen recordings, past user tests, and competitive benchmarking.</p>
-        <img src="doris_07.jpg" class="modal-img" alt="Empathise — data insights">
-        <img src="doris_08.jpg" class="modal-img" alt="Empathise — user behavior understanding">
-        <img src="doris_09.jpg" class="modal-img" alt="Main data insights — drop-off before main flow">
-        <img src="doris_10.jpg" class="modal-img" alt="3DLook and Wannafashion competitor investigation">
-      </div>
-
-      <!-- Phase 2: Conceptualise -->
-      <div class="modal-section">
-        <div class="modal-section-label">2. Conceptualise</div>
-        <h2 class="modal-section-title">Hypotheses, affinity mapping, and CAD matrix</h2>
-        <p class="modal-body">We ran workshops to cluster insights and build a CAD matrix (certainties, assumptions, doubts) across every aspect of the flow. Core issues revealed: lack of awareness of previous value, poor onboarding, misinteractions, and hidden flows.</p>
-        <img src="doris_11.jpg" class="modal-img" alt="Conceptualise phase">
-        <img src="doris_12.jpg" class="modal-img" alt="Build hypotheses — user-centered and technical feasibility">
-        <img src="doris_13.jpg" class="modal-img" alt="Core issues revealed">
-        <img src="doris_14.jpg" class="modal-img" alt="CAD Matrix key takeaways">
-        <img src="doris_15.jpg" class="modal-img" alt="Affinity map key takeaways">
-        <img src="doris_16.jpg" class="modal-img" alt="Main hypotheses">
-      </div>
-
-      <!-- Phase 3: Design -->
-      <div class="modal-section">
-        <div class="modal-section-label">3. Design</div>
-        <h2 class="modal-section-title">4 fast changes as a multivariable test</h2>
-        <p class="modal-body">Instead of a full redesign, we implemented 4 targeted changes as a multivariable test to accelerate data collection: removed the non-functional onboarding screen, revised the main flow invitation to reduce cognitive confusion, and enhanced the camera UI activation.</p>
-        <img src="doris_17.jpg" class="modal-img" alt="Design phase">
-        <img src="doris_18.jpg" class="modal-img" alt="4 fast simple changes">
-        <img src="doris_19.jpg" class="modal-img" alt="Design decision 1 — removed onboarding screen">
-        <img src="doris_20.jpg" class="modal-img" alt="Design decision 2 — revised main flow invitation">
-      </div>
-
-      <!-- Outcomes -->
-      <div class="modal-section">
-        <div class="modal-section-label" data-en="Outcomes" data-pt="Resultados">Outcomes</div>
-        <h2 class="modal-section-title">200% conversion lift. 285% feature adoption growth.</h2>
-        <div class="modal-outcomes-grid">
-          <div class="modal-outcome">
-            <div class="modal-outcome-num">200%</div>
-            <div class="modal-outcome-label" data-en="Conversion increase (3% → 9%)" data-pt="Aumento de conversão (3% → 9%)">Conversion increase (3% → 9%)</div>
+        <h2 class="modal-section-title" data-en="At least 15% of users called support instead of booking online" data-pt="Pelo menos 15% ligavam para o suporte em vez de reservar online">At least 15% of users called support instead of booking online</h2>
+        <p class="modal-body en-only">The experience generated enough confusion that users abandoned the platform mid-flow and resorted to phone support. Three core issues drove this:</p>
+        <p class="modal-body pt-only">A experiência gerava confusão suficiente para os usuários abandonarem a plataforma no meio do fluxo. Três problemas centrais causavam isso:</p>
+        <div class="ms-highlights" style="margin-top:1rem;">
+          <div class="ms-highlight">
+            <strong data-en="No total price visibility" data-pt="Sem visibilidade do preço total">No total price visibility</strong>
+            <span class="en-only">Users reached the end of the booking flow without ever seeing the full round-trip cost.</span>
+            <span class="pt-only">Os usuários chegavam ao fim do fluxo sem nunca ver o custo total da viagem de ida e volta.</span>
           </div>
-          <div class="modal-outcome">
-            <div class="modal-outcome-num">+285%</div>
-            <div class="modal-outcome-label" data-en="Feature adoption (1.3% → 5%)" data-pt="Adoção de feature (1,3% → 5%)">Feature adoption (1.3% → 5%)</div>
+          <div class="ms-highlight">
+            <strong data-en="Three-tab navigation" data-pt="Navegação por três abas">Three-tab navigation</strong>
+            <span class="en-only">Outbound, Return, and Combined fares split across separate tabs. 20% didn't know what "Combined" meant.</span>
+            <span class="pt-only">Tarifas de Ida, Volta e Combinadas em abas separadas. 20% não sabiam o que significava "Combinado".</span>
           </div>
-          <div class="modal-outcome">
-            <div class="modal-outcome-num">550K</div>
-            <div class="modal-outcome-label" data-en="Active users reached" data-pt="Usuários ativos atingidos">Active users reached</div>
+          <div class="ms-highlight">
+            <strong data-en="Visual and language overload" data-pt="Sobrecarga visual e de linguagem">Visual and language overload</strong>
+            <span class="en-only">Excessive colors and technical terminology that didn't match how travelers naturally speak about flights.</span>
+            <span class="pt-only">Cores excessivas e terminologia técnica que não correspondiam à forma natural de falar sobre voos.</span>
           </div>
+        </div>
+        <img src="07_Section.png" class="modal-img" loading="lazy" decoding="async" alt="User pains and business data">
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Discovery" data-pt="Descoberta">Discovery</div>
+        <h2 class="modal-section-title" data-en="The previous experience — annotated" data-pt="A experiência anterior — anotada">The previous experience — annotated</h2>
+        <img src="05_Section.png" class="modal-img" loading="lazy" decoding="async" alt="Previous experience annotated">
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Solution" data-pt="Solução">Solution</div>
+        <h2 class="modal-section-title" data-en="5 decisions that removed friction from end to end" data-pt="5 decisões que eliminaram o atrito de ponta a ponta">5 decisions that removed friction from end to end</h2>
+        <div class="ms-highlights">
+          <div class="ms-highlight"><strong data-en="Simpler search header" data-pt="Cabeçalho de busca simplificado">Simpler search header</strong><span data-en="Reduced input fields and visual noise." data-pt="Menos campos e ruído visual.">Reduced input fields and visual noise.</span></div>
+          <div class="ms-highlight"><strong data-en="Unified date + period calendar" data-pt="Calendário unificado de datas">Unified date + period calendar</strong><span data-en="One component replacing four separate inputs." data-pt="Um componente substituindo quatro campos separados.">One component replacing four separate inputs.</span></div>
+          <div class="ms-highlight"><strong data-en="Loading status bar" data-pt="Barra de status de carregamento">Loading status bar</strong><span data-en="Progress indicator during the 60-second search — replacing a blank screen." data-pt="Indicador de progresso durante a busca de 60s — substituindo uma tela em branco.">Progress indicator during the 60-second search — replacing a blank screen.</span></div>
+          <div class="ms-highlight"><strong data-en="Round-trip price from the first result" data-pt="Preço total desde o primeiro resultado">Round-trip price from the first result</strong><span data-en="Full trip cost on every outbound card. No surprises at checkout." data-pt="Custo total em cada resultado. Sem surpresas no checkout.">Full trip cost on every outbound card. No surprises at checkout.</span></div>
+          <div class="ms-highlight"><strong data-en="Inline return selection" data-pt="Seleção de retorno inline">Inline return selection</strong><span data-en="Best returns appear below the selected outbound — one page, one flow." data-pt="Melhores retornos aparecem abaixo da ida — uma página, um fluxo.">Best returns appear below the selected outbound — one page, one flow.</span></div>
         </div>
       </div>
 
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Testing" data-pt="Testes">Testing</div>
+        <h2 class="modal-section-title" data-en="Moderated sessions + async Maze testing" data-pt="Sessões moderadas + testes assíncronos no Maze">Moderated sessions + async Maze testing</h2>
+        <p class="modal-body en-only">5 moderated sessions via Google Meet with recorded video, plus async testing via Maze. <strong>Key finding 1:</strong> Date calendar with time-period sliders caused friction — simplified in final version. <strong>Key finding 2:</strong> Showing return flights directly below outbound confused 4 of 5 participants — redesigned as a dedicated step.</p>
+        <p class="modal-body pt-only">5 sessões moderadas via Google Meet com vídeo gravado, mais testes assíncronos via Maze. <strong>Achado 1:</strong> Calendário com sliders de período causava atrito — simplificado na versão final. <strong>Achado 2:</strong> Mostrar retorno abaixo da ida confundiu 4 de 5 participantes — redesenhado como etapa dedicada.</p>
+        <div class="ms-split" style="margin-top:1rem;">
+          <img src="09_Section.png" class="modal-img" style="margin:0;" loading="lazy" decoding="async" alt="Calendar test results">
+          <img src="10_Section.png" class="modal-img" style="margin:0;" loading="lazy" decoding="async" alt="Return flight test results">
+        </div>
+        <img src="11_Section.png" class="modal-img" loading="lazy" decoding="async" alt="Maze quantitative results">
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Final Design · Mobile" data-pt="Design Final · Mobile">Final Design · Mobile</div>
+        <h2 class="modal-section-title">Web & Mobile (Flutter)</h2>
+        <img src="mobile_screens.png" class="modal-img" loading="lazy" decoding="async" alt="VOLL Flights mobile screens">
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Outcomes · H2 2025" data-pt="Resultados · S2 2025">Outcomes · H2 2025</div>
+        <h2 class="modal-section-title" data-en="From 14% offline to 2.4% — in one semester" data-pt="De 14% offline para 2,4% — em um semestre">From 14% offline to 2.4% — in one semester</h2>
+        <div class="modal-outcomes-grid">
+          <div class="modal-outcome"><div class="modal-outcome-num">82.37</div><div class="modal-outcome-label" data-en="NPS (from 78.6 in H1)" data-pt="NPS (de 78,6 no S1)">NPS (from 78.6 in H1)</div></div>
+          <div class="modal-outcome"><div class="modal-outcome-num">-82%</div><div class="modal-outcome-label" data-en="Offline bookings (14% to 2.4%)" data-pt="Reservas offline (14% para 2,4%)">Offline bookings (14% to 2.4%)</div></div>
+          <div class="modal-outcome"><div class="modal-outcome-num">-41%</div><div class="modal-outcome-label" data-en="Support tickets per transaction" data-pt="Tickets por transacao">Support tickets per transaction</div></div>
+        </div>
+        <img src="12_Section.png" class="modal-img" loading="lazy" decoding="async" alt="Outcomes charts H2 2025">
+      </div>
+    </div><!-- /case-voll -->
+
+    <!-- Doris Widget Case Study Content -->
+    <div id="case-doris" style="display:none;">
+      <div class="modal-header">
+        <div style="font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--amber);margin-bottom:0.75rem;">Case Study · 2021–2024</div>
+        <h1 class="modal-title">Doris Widget</h1>
+        <p class="modal-subtitle" data-en="Increasing feature adoption for a virtual try-on tool" data-pt="Aumentando a adocao de um widget de prova virtual">Increasing feature adoption for a virtual try-on tool</p>
+        <div class="modal-meta-row">
+          <div class="modal-meta-item"><div class="label" data-en="Role" data-pt="Papel">Role</div><div class="value">Lead Product Designer</div></div>
+          <div class="modal-meta-item"><div class="label" data-en="Timeline" data-pt="Duracao">Timeline</div><div class="value" data-en="3 years" data-pt="3 anos">3 years</div></div>
+          <div class="modal-meta-item"><div class="label">Platform</div><div class="value">Mobile · E-commerce</div></div>
+          <div class="modal-meta-item"><div class="label" data-en="Company" data-pt="Empresa">Company</div><div class="value">Doris</div></div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Context" data-pt="Contexto">Context</div>
+        <div class="ms-split ms-split-wide">
+          <div class="ms-text">
+            <h2 class="modal-section-title" data-en="Virtual try-on embedded in Brazilian e-commerce" data-pt="Prova virtual integrada ao e-commerce brasileiro">Virtual try-on embedded in Brazilian e-commerce</h2>
+            <p class="modal-body en-only">Doris allows customers to virtually try on clothes and receive precise sizing recommendations through a widget embedded in partner stores. The flow required 2 full-body photos. The product was technically sound. The adoption wasn't.</p>
+            <p class="modal-body pt-only">A Doris permite que clientes provem roupas virtualmente e recebam recomendacoes precisas de tamanho por um widget integrado a lojas parceiras. O fluxo exigia 2 fotos de corpo inteiro. O produto era tecnicamente solido. A adocao, nao.</p>
+          </div>
+          <img src="doris_02.jpg" class="modal-img" style="margin:0;" loading="lazy" decoding="async" alt="Doris virtual try-on">
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="The problem" data-pt="O problema">The problem</div>
+        <h2 class="modal-section-title" data-en="Only 1.2% of activated users completed the task" data-pt="Apenas 1,2% dos usuarios ativados completaram a tarefa">Only 1.2% of activated users completed the task</h2>
+        <p class="modal-body en-only">User tests in controlled environments couldn't predict that real-world context — time, place, privacy, lighting — would be a significant barrier. After launch, the data confirmed the gap.</p>
+        <p class="modal-body pt-only">Testes em ambientes controlados nao conseguiram prever que o contexto real — tempo, lugar, privacidade, iluminacao — seria uma barreira significativa. Apos o lancamento, os dados confirmaram a lacuna.</p>
+        <div class="ms-stat-row">
+          <div class="ms-stat"><div class="ms-stat-num">1.2%</div><div class="ms-stat-label" data-en="Completed the main flow at launch" data-pt="Completaram o fluxo principal no lancamento">Completed the main flow at launch</div></div>
+          <div class="ms-stat"><div class="ms-stat-num">18%</div><div class="ms-stat-label" data-en="Left the camera screen immediately" data-pt="Saíram da tela da camara imediatamente">Left the camera screen immediately</div></div>
+          <div class="ms-stat"><div class="ms-stat-num">22%</div><div class="ms-stat-label" data-en="Exited the site after activation" data-pt="Saíram do site apos ativacao">Exited the site after activation</div></div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Objective" data-pt="Objetivo">Objective</div>
+        <h2 class="modal-section-title" data-en="Get from 1.2% to at least 5% without breaking revenue" data-pt="Ir de 1,2% para pelo menos 5% sem quebrar a receita">Get from 1.2% to at least 5% without breaking revenue</h2>
+        <p class="modal-body en-only">Research and hold squad workshops to build strong hypotheses. Design simple, fast tests to increase main flow usage without compromising the revenue stream from existing e-commerce partners.</p>
+        <p class="modal-body pt-only">Pesquisar e realizar workshops com o squad para construir hipoteses solidas. Projetar testes simples e rapidos para aumentar o uso do fluxo principal sem comprometer a receita dos parceiros.</p>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Process" data-pt="Processo">Process</div>
+        <h2 class="modal-section-title" data-en="Three phases: Empathise to Conceptualise to Design" data-pt="Tres fases: Empatizar, Conceitualizar e Design">Three phases: Empathise to Conceptualise to Design</h2>
+        <div class="ms-phase-pills">
+          <span class="ms-pill ms-pill-active" data-en="1. Empathise" data-pt="1. Empatizar">1. Empathise</span>
+          <span class="ms-pill ms-pill-active" data-en="2. Conceptualise" data-pt="2. Conceitualizar">2. Conceptualise</span>
+          <span class="ms-pill ms-pill-active" data-en="3. Design" data-pt="3. Design">3. Design</span>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="1. Empathise" data-pt="1. Empatizar">1. Empathise</div>
+        <h2 class="modal-section-title" data-en="No real user access — so we mined our own data" data-pt="Sem acesso a usuarios reais — mineramos nossos proprios dados">No real user access — so we mined our own data</h2>
+        <p class="modal-body en-only">Without direct user access, we extracted insights from drop-off analytics via Amplitude, screen recordings, past usability tests, and competitive benchmarking against 3DLook and Wannafashion.</p>
+        <p class="modal-body pt-only">Sem acesso direto a usuarios, extraimos insights de analytics de abandono via Amplitude, gravacoes de tela, testes de usabilidade anteriores e benchmarking competitivo contra 3DLook e Wannafashion.</p>
+        <div class="ms-highlights" style="margin-bottom:1rem;">
+          <div class="ms-highlight">
+            <strong data-en="Main data insight" data-pt="Principal insight dos dados">Main data insight</strong>
+            <span class="en-only">The primary drop-off happened before users reached the main flow — the problem was upstream.</span>
+            <span class="pt-only">O principal abandono ocorria antes dos usuarios chegarem ao fluxo principal — o problema era anterior.</span>
+          </div>
+          <div class="ms-highlight">
+            <strong data-en="Competitor insight" data-pt="Insight da concorrencia">Competitor insight</strong>
+            <span class="en-only">3DLook and Wannafashion used richer product page triggers and contextual onboarding to set expectations before the camera opened.</span>
+            <span class="pt-only">3DLook e Wannafashion usavam gatilhos mais ricos e onboarding contextual para preparar o usuario antes da camera abrir.</span>
+          </div>
+        </div>
+        <div class="ms-split">
+          <img src="doris_07.jpg" class="modal-img" style="margin:0;" loading="lazy" decoding="async" alt="Data analysis">
+          <img src="doris_08.jpg" class="modal-img" style="margin:0;" loading="lazy" decoding="async" alt="User behavior recordings">
+        </div>
+        <img src="doris_09.jpg" class="modal-img" loading="lazy" decoding="async" alt="Main data insights flow">
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="2. Conceptualise" data-pt="2. Conceitualizar">2. Conceptualise</div>
+        <h2 class="modal-section-title" data-en="Workshops, affinity mapping, and CAD matrix" data-pt="Workshops, mapeamento de afinidade e matriz CAD">Workshops, affinity mapping, and CAD matrix</h2>
+        <p class="modal-body en-only">Squad workshops produced hypotheses clustered into an Affinity Map and refined through a CAD matrix (Certainties, Assumptions, Doubts) covering every aspect of the product flow.</p>
+        <p class="modal-body pt-only">Workshops com o squad produziram hipoteses agrupadas em um Mapa de Afinidade e refinadas por uma matriz CAD (Certezas, Suposicoes, Duvidas) cobrindo cada aspecto do fluxo do produto.</p>
+        <div class="ms-highlights" style="margin-bottom:1rem;">
+          <div class="ms-highlight">
+            <strong data-en="Affinity map findings" data-pt="Achados do mapa de afinidade">Affinity map findings</strong>
+            <span class="en-only">Lack of user feedback and guidance. Lack of product value communication. Identical branched flows causing cognitive confusion.</span>
+            <span class="pt-only">Falta de feedback e orientacao ao usuario. Falta de comunicacao do valor do produto. Fluxos ramificados identicos gerando confusao cognitiva.</span>
+          </div>
+          <div class="ms-highlight">
+            <strong data-en="CAD matrix findings" data-pt="Achados da matriz CAD">CAD matrix findings</strong>
+            <span class="en-only">Users may be outside appropriate photo context. May not know they need to tap START. Onboarding lacked value delivery details.</span>
+            <span class="pt-only">Usuarios podem estar fora do contexto adequado para fotos. Podem nao saber que precisam tocar INICIAR. Onboarding nao comunicava o valor.</span>
+          </div>
+        </div>
+        <div class="ms-split">
+          <img src="doris_12.jpg" class="modal-img" style="margin:0;" loading="lazy" decoding="async" alt="Hypothesis building">
+          <img src="doris_13.jpg" class="modal-img" style="margin:0;" loading="lazy" decoding="async" alt="Affinity map">
+        </div>
+        <div class="ms-split">
+          <img src="doris_14.jpg" class="modal-img" style="margin:0;" loading="lazy" decoding="async" alt="CAD matrix">
+          <img src="doris_16.jpg" class="modal-img" style="margin:0;" loading="lazy" decoding="async" alt="Main hypotheses">
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="3. Design" data-pt="3. Design">3. Design</div>
+        <h2 class="modal-section-title" data-en="4 targeted changes as a multivariable test" data-pt="4 mudancas direcionadas como teste multivariavel">4 targeted changes as a multivariable test</h2>
+        <p class="modal-body en-only">Rather than a full redesign, we implemented 4 fast, isolated changes to accelerate data collection and validate hypotheses in production.</p>
+        <p class="modal-body pt-only">Em vez de um redesign completo, implementamos 4 mudancas rapidas e isoladas para acelerar a coleta de dados e validar hipoteses em producao.</p>
+        <div class="ms-highlights" style="margin-bottom:1rem;">
+          <div class="ms-highlight">
+            <strong data-en="Decision 1 - Removed non-functional onboarding" data-pt="Decisao 1 - Remocao do onboarding sem funcao">Decision 1 - Removed non-functional onboarding</strong>
+            <span class="en-only">The splash screen added friction without delivering value. Removed entirely from the flow.</span>
+            <span class="pt-only">A tela de splash adicionava atrito sem entregar valor. Removida completamente do fluxo.</span>
+          </div>
+          <div class="ms-highlight">
+            <strong data-en="Decision 2 - Revised main flow invitation" data-pt="Decisao 2 - Revisao do convite ao fluxo principal">Decision 2 - Revised main flow invitation</strong>
+            <span class="en-only">Redesigned the widget trigger on the product page to better communicate value and reduce confusion.</span>
+            <span class="pt-only">O gatilho do widget na pagina de produto foi redesenhado para comunicar melhor o valor e reduzir a confusao.</span>
+          </div>
+          <div class="ms-highlight">
+            <strong data-en="Decision 3 - Enhanced camera UI activation" data-pt="Decisao 3 - Ativacao aprimorada da UI da camera">Decision 3 - Enhanced camera UI activation</strong>
+            <span class="en-only">Made the START action more prominent and explained what would happen next.</span>
+            <span class="pt-only">A acao INICIAR foi tornada mais proeminente e explicou o que aconteceria a seguir.</span>
+          </div>
+          <div class="ms-highlight">
+            <strong data-en="Decision 4 - Improved in-flow guidance" data-pt="Decisao 4 - Orientacao aprimorada dentro do fluxo">Decision 4 - Improved in-flow guidance</strong>
+            <span class="en-only">Real-time feedback during photo capture to reduce abandonment at the hardest step.</span>
+            <span class="pt-only">Feedback em tempo real durante a captura de fotos para reduzir o abandono na etapa mais difícil.</span>
+          </div>
+        </div>
+        <img src="doris_19.jpg" class="modal-img" loading="lazy" decoding="async" alt="Design decision 1">
+        <img src="doris_20.jpg" class="modal-img" loading="lazy" decoding="async" alt="Design decision 2">
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Outcomes" data-pt="Resultados">Outcomes</div>
+        <h2 class="modal-section-title" data-en="200% conversion lift. 285% feature adoption growth." data-pt="200% de aumento de conversao. 285% de crescimento na adocao.">200% conversion lift. 285% feature adoption growth.</h2>
+        <div class="modal-outcomes-grid">
+          <div class="modal-outcome"><div class="modal-outcome-num">200%</div><div class="modal-outcome-label" data-en="Conversion increase (3% to 9%)" data-pt="Aumento de conversao (3% para 9%)">Conversion increase (3% to 9%)</div></div>
+          <div class="modal-outcome"><div class="modal-outcome-num">+285%</div><div class="modal-outcome-label" data-en="Feature adoption (1.3% to 5%)" data-pt="Adocao de feature (1,3% para 5%)">Feature adoption (1.3% to 5%)</div></div>
+          <div class="modal-outcome"><div class="modal-outcome-num">550K</div><div class="modal-outcome-label" data-en="Active users reached" data-pt="Usuarios ativos atingidos">Active users reached</div></div>
+        </div>
+      </div>
     </div><!-- /case-doris -->
+
   </div><!-- /modal-content -->
 </div><!-- /modal-overlay -->
 
@@ -1528,10 +1567,7 @@ function navigate(idx) {
 
   updateArrows();
 
-  // Switch cursor: X on contact section, ship everywhere else
-  document.getElementById('cursor').classList.toggle('x-mode', idx === sections.length - 1);
-
-  // Animate camera
+  // Animate camera only — ship is driven by ticker below
   const { x, y } = getCameraOffset(idx);
   gsap.to(world, {
     x, y,
@@ -1539,33 +1575,35 @@ function navigate(idx) {
     ease: 'power3.inOut',
     onComplete: () => { isAnimating = false; }
   });
-
-  // Hide map ship on contact (cursor is the X)
-  ship.style.opacity = idx === sections.length - 1 ? '0' : '1';
-
-  // Move ship along arc (midpoint elevated above both islands)
-  const midX = (fromSection.x + next.x) / 2;
-  const midY = getPathY(midX) - 80; // arc peak above path
-  gsap.to(ship, {
-    left: midX, top: midY,
-    duration: 0.8, ease: 'power1.in',
-    onComplete: () => {
-      gsap.to(ship, {
-        left: next.x, top: getPathY(next.x),
-        duration: 0.8, ease: 'power1.out',
-      });
-    }
-  });
 }
 
 // ── Init camera ──
 function initCamera() {
   const { x, y } = getCameraOffset(0);
   gsap.set(world, { x, y });
-  gsap.set(ship, { left: 800, top: getPathY(800) });
 }
 
-// ── Ship follows path during drag — accurate bezier calculation ──
+// ── Ship follows path in real time via GSAP ticker ──
+// gsap.getProperty reads from GSAP cache — no DOM/layout access, very fast
+let _lastShipX = -1;
+gsap.ticker.add(() => {
+  const wx = gsap.getProperty(world, 'x');
+  const shipWorldX = window.innerWidth / 2 - wx;
+  if (Math.abs(shipWorldX - _lastShipX) < 0.5) return; // skip if no meaningful change
+  _lastShipX = shipWorldX;
+
+  const onContact = shipWorldX > 6200;
+  ship.style.opacity = onContact ? '0' : '1';
+  cursorEl.classList.toggle('x-mode', onContact);
+
+  if (!onContact) {
+    const sy = getPathY(shipWorldX);
+    ship.style.left = shipWorldX + 'px';
+    ship.style.top  = sy + 'px';
+  }
+});
+
+// ── Bezier path precomputed LUT for O(1) ship positioning ──
 const PATH_SEGMENTS = [
   [{x:800,y:900}, {x:1400,y:700}, {x:2200,y:870}],
   [{x:2200,y:870}, {x:2900,y:1050},{x:3800,y:920}],
@@ -1573,27 +1611,34 @@ const PATH_SEGMENTS = [
   [{x:5400,y:900}, {x:6000,y:980}, {x:6800,y:900}],
 ];
 
-function bezierPt(t, p0, p1, p2) {
-  const m = 1 - t;
-  return {
-    x: m*m*p0.x + 2*m*t*p1.x + t*t*p2.x,
-    y: m*m*p0.y + 2*m*t*p1.y + t*t*p2.y,
-  };
-}
-
-function getPathY(worldX) {
-  for (const [p0, p1, p2] of PATH_SEGMENTS) {
-    if (worldX >= p0.x && worldX <= p2.x) {
-      // Binary search for t where bezierPt(t).x ≈ worldX
-      let lo = 0, hi = 1;
-      for (let i = 0; i < 24; i++) {
-        const mid = (lo + hi) / 2;
-        bezierPt(mid, p0, p1, p2).x < worldX ? lo = mid : hi = mid;
-      }
-      return bezierPt((lo + hi) / 2, p0, p1, p2).y;
+// Build LUT: 400 samples across the full path for fast lookup
+const PATH_LUT = (() => {
+  const pts = [];
+  for (const [p0,p1,p2] of PATH_SEGMENTS) {
+    const steps = 100;
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      const m = 1 - t;
+      pts.push({
+        x: m*m*p0.x + 2*m*t*p1.x + t*t*p2.x,
+        y: m*m*p0.y + 2*m*t*p1.y + t*t*p2.y,
+      });
     }
   }
-  return worldX < 800 ? 900 : 900;
+  pts.sort((a,b) => a.x - b.x);
+  return pts;
+})();
+
+function getPathY(worldX) {
+  if (worldX <= PATH_LUT[0].x) return PATH_LUT[0].y;
+  if (worldX >= PATH_LUT[PATH_LUT.length-1].x) return PATH_LUT[PATH_LUT.length-1].y;
+  let lo = 0, hi = PATH_LUT.length - 1;
+  while (lo < hi - 1) {
+    const mid = (lo + hi) >> 1;
+    PATH_LUT[mid].x < worldX ? lo = mid : hi = mid;
+  }
+  const t = (worldX - PATH_LUT[lo].x) / (PATH_LUT[hi].x - PATH_LUT[lo].x);
+  return PATH_LUT[lo].y + t * (PATH_LUT[hi].y - PATH_LUT[lo].y);
 }
 
 // ── Drag to pan ──
@@ -1603,6 +1648,7 @@ let worldStartX = 0, worldStartY = 0;
 let dragMoved = false;
 
 const vp = document.getElementById('viewport');
+const cursorEl = document.getElementById('cursor');
 
 vp.addEventListener('mousedown', e => {
   if (e.target.closest('button, a, .journey-dot, .panel')) return;
@@ -1610,9 +1656,9 @@ vp.addEventListener('mousedown', e => {
   dragMoved = false;
   dragStartX = e.clientX;
   dragStartY = e.clientY;
-  const m = new DOMMatrix(getComputedStyle(world).transform);
-  worldStartX = m.m41;
-  worldStartY = m.m42;
+  // Use gsap.getProperty instead of getComputedStyle — reads from GSAP cache, no layout thrash
+  worldStartX = gsap.getProperty(world, 'x');
+  worldStartY = gsap.getProperty(world, 'y');
   vp.style.cursor = 'grabbing';
 });
 
@@ -1624,13 +1670,7 @@ window.addEventListener('mousemove', e => {
   const newWorldX = worldStartX + dx;
   const newWorldY = worldStartY + dy;
   gsap.set(world, { x: newWorldX, y: newWorldY });
-
-  // Ship follows path at screen-center X — bottom of ship ON the line
-  const shipWorldX = window.innerWidth / 2 - newWorldX;
-  const shipWorldY = getPathY(shipWorldX);
-  if (ship.style.opacity !== '0') {
-    gsap.set(ship, { left: shipWorldX, top: shipWorldY });
-  }
+  // Ship position is updated by gsap.ticker automatically
 });
 
 window.addEventListener('mouseup', () => {
@@ -1666,9 +1706,8 @@ let worldTouchStartX = 0, worldTouchStartY = 0;
 document.addEventListener('touchstart', e => {
   touchStartX = e.touches[0].clientX;
   touchStartY = e.touches[0].clientY;
-  const m = new DOMMatrix(getComputedStyle(world).transform);
-  worldTouchStartX = m.m41;
-  worldTouchStartY = m.m42;
+  worldTouchStartX = gsap.getProperty(world, 'x');
+  worldTouchStartY = gsap.getProperty(world, 'y');
 }, { passive: true });
 
 document.addEventListener('touchmove', e => {
@@ -1730,6 +1769,7 @@ function navigateByCamera(dir) {
 function toggleLang() {
   currentLang = currentLang === 'en' ? 'pt' : 'en';
   document.documentElement.lang = currentLang;
+  document.documentElement.setAttribute('data-lang', currentLang);
   document.getElementById('lang-en').classList.toggle('active', currentLang === 'en');
   document.getElementById('lang-pt').classList.toggle('active', currentLang === 'pt');
 
@@ -1759,63 +1799,6 @@ function closeCase() {
   overlay.classList.remove('open');
   document.body.style.overflow = 'hidden';
 }
-
-// ── Image strip drag scroll ──
-document.querySelectorAll('.case-image-strip').forEach(strip => {
-  let isDown = false, startX, scrollLeft;
-  strip.addEventListener('mousedown', e => {
-    isDown = true; strip.style.cursor = 'grabbing';
-    startX = e.pageX - strip.offsetLeft;
-    scrollLeft = strip.scrollLeft;
-  });
-  strip.addEventListener('mouseleave', () => { isDown = false; strip.style.cursor = 'grab'; });
-  strip.addEventListener('mouseup', () => { isDown = false; strip.style.cursor = 'grab'; });
-  strip.addEventListener('mousemove', e => {
-    if (!isDown) return;
-    e.preventDefault();
-    const x = e.pageX - strip.offsetLeft;
-    strip.scrollLeft = scrollLeft - (x - startX) * 1.5;
-  });
-});
-
-// ── Animate wave layers ──
-function createWaves() {
-  for (let i = 0; i < 8; i++) {
-    const el = document.createElement('div');
-    el.className = 'wave-layer';
-    el.style.top = `${Math.random() * 2800 + 100}px`;
-    el.style.animation = `wave-move ${4 + Math.random() * 4}s linear infinite`;
-    el.style.animationDelay = `${Math.random() * 4}s`;
-    document.getElementById('ocean-bg').appendChild(el);
-  }
-}
-createWaves();
-
-// Floating particles
-function createParticles() {
-  for (let i = 0; i < 20; i++) {
-    const p = document.createElement('div');
-    p.style.cssText = `
-      position:absolute;
-      width:2px; height:2px;
-      background:rgba(245,230,200,0.15);
-      border-radius:50%;
-      left:${Math.random() * 5200}px;
-      top:${Math.random() * 3000}px;
-      animation: float-particle ${6+Math.random()*8}s ease-in-out ${Math.random()*6}s infinite alternate;
-    `;
-    document.getElementById('ocean-bg').appendChild(p);
-  }
-}
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes float-particle {
-    from { transform: translateY(0) translateX(0); opacity: 0.1; }
-    to { transform: translateY(-30px) translateX(15px); opacity: 0.5; }
-  }
-`;
-document.head.appendChild(style);
-createParticles();
 
 // ── Window resize ──
 window.addEventListener('resize', () => {
