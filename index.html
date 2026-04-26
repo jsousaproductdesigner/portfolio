@@ -1107,7 +1107,11 @@ body.dragging #cursor-x    { display: none; }
   <!-- ══════════ SECTION 2: VOLL FLIGHTS CASE ══════════ -->
   <div class="map-section" id="case1-section" style="left:3800px; top:975px;">
     <div class="panel case-card">
-      <div class="case-header" style="padding:2rem 2.5rem 1.5rem;">
+      <div style="height:130px; overflow:hidden; position:relative; border-radius:var(--r-xl) var(--r-xl) 0 0;">
+        <img src="cover.png" alt="VOLL Flights" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+        <div style="position:absolute; inset:0; background:linear-gradient(to bottom, rgba(6,12,24,0.15) 0%, var(--parchment) 100%);"></div>
+      </div>
+      <div class="case-header" style="padding:1.5rem 2.5rem 1.5rem;">
         <div class="case-meta" style="margin-bottom:0.75rem;">
           <div class="case-meta-item">
             <div class="case-meta-label" data-en="Role" data-pt="Papel">Role</div>
@@ -1277,6 +1281,7 @@ body.dragging #cursor-x    { display: none; }
           </div>
           <img src="01_Section.png" class="modal-img" style="margin:0;align-self:center;" loading="lazy" decoding="async" alt="VOLL Flights UI">
         </div>
+        <img src="02_Section.png" class="modal-img" loading="lazy" decoding="async" alt="VOLL context and original interface">
       </div>
 
       <div class="modal-section">
@@ -1301,13 +1306,44 @@ body.dragging #cursor-x    { display: none; }
             <span class="pt-only">Cores excessivas e terminologia técnica que não correspondiam à forma natural de falar sobre voos.</span>
           </div>
         </div>
+        <img src="06_Section.png" class="modal-img" loading="lazy" decoding="async" alt="User pains and business needs data">
         <img src="07_Section.png" class="modal-img" loading="lazy" decoding="async" alt="User pains and business data">
       </div>
 
       <div class="modal-section">
         <div class="modal-section-label" data-en="Discovery" data-pt="Descoberta">Discovery</div>
         <h2 class="modal-section-title" data-en="The previous experience — annotated" data-pt="A experiência anterior — anotada">The previous experience — annotated</h2>
+        <p class="modal-body en-only">A structured audit of the existing booking flow mapped friction across every step — from the search header to the fare selection screen. Key annotations identified split date pickers requiring four separate inputs, a blank loading screen lasting up to 60 seconds, and a three-tab navigation (Outbound / Return / Combined) where 25% of users didn't know the difference between tabs.</p>
+        <p class="modal-body pt-only">Uma auditoria estruturada do fluxo de reserva existente mapeou atritos em cada etapa — do cabeçalho de busca à seleção de tarifas. As anotações identificaram seletores de datas separados exigindo quatro campos distintos, uma tela de carregamento em branco de até 60 segundos, e uma navegação em três abas (Ida / Volta / Combinado) onde 25% dos usuários não sabiam a diferença.</p>
+        <img src="14_Section.png" class="modal-img" loading="lazy" decoding="async" alt="Previous experience annotated — full detail">
         <img src="05_Section.png" class="modal-img" loading="lazy" decoding="async" alt="Previous experience annotated">
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Process" data-pt="Processo">Process</div>
+        <h2 class="modal-section-title" data-en="2-month sprint in 3 phases" data-pt="Sprint de 2 meses em 3 fases">2-month sprint in 3 phases</h2>
+        <div class="ms-phase-pills">
+          <span class="ms-pill ms-pill-active" data-en="1. Research" data-pt="1. Pesquisa">1. Research</span>
+          <span class="ms-pill ms-pill-active" data-en="2. Design" data-pt="2. Design">2. Design</span>
+          <span class="ms-pill ms-pill-active" data-en="3. Test & Ship" data-pt="3. Testar e Entregar">3. Test & Ship</span>
+        </div>
+        <div class="ms-highlights" style="margin-top:1rem;">
+          <div class="ms-highlight">
+            <strong data-en="Weeks 1–2 · Research" data-pt="Semanas 1–2 · Pesquisa">Weeks 1–2 · Research</strong>
+            <span class="en-only">Support log audit (6 months of tickets), flow annotation, and heuristic evaluation. Quantified 3 core friction drivers from existing data.</span>
+            <span class="pt-only">Auditoria de logs de suporte (6 meses de tickets), anotação do fluxo e avaliação heurística. 3 causas principais de atrito quantificadas a partir dos dados existentes.</span>
+          </div>
+          <div class="ms-highlight">
+            <strong data-en="Weeks 3–6 · Design" data-pt="Semanas 3–6 · Design">Weeks 3–6 · Design</strong>
+            <span class="en-only">Wireframes to high-fidelity screens in Figma. 3 major directions explored. Flutter-ready component specs delivered to engineering.</span>
+            <span class="pt-only">Wireframes até telas de alta fidelidade no Figma. 3 direções principais exploradas. Specs de componentes prontos para Flutter entregues à engenharia.</span>
+          </div>
+          <div class="ms-highlight">
+            <strong data-en="Weeks 7–8 · Test & Hand-off" data-pt="Semanas 7–8 · Teste e Entrega">Weeks 7–8 · Test & Hand-off</strong>
+            <span class="en-only">5 moderated sessions + async Maze. 2 critical redesigns from findings. Final specs and hand-off.</span>
+            <span class="pt-only">5 sessões moderadas + Maze assíncrono. 2 redesigns críticos a partir dos achados. Specs finais e hand-off.</span>
+          </div>
+        </div>
       </div>
 
       <div class="modal-section">
@@ -1320,6 +1356,7 @@ body.dragging #cursor-x    { display: none; }
           <div class="ms-highlight"><strong data-en="Round-trip price from the first result" data-pt="Preço total desde o primeiro resultado">Round-trip price from the first result</strong><span data-en="Full trip cost on every outbound card. No surprises at checkout." data-pt="Custo total em cada resultado. Sem surpresas no checkout.">Full trip cost on every outbound card. No surprises at checkout.</span></div>
           <div class="ms-highlight"><strong data-en="Inline return selection" data-pt="Seleção de retorno inline">Inline return selection</strong><span data-en="Best returns appear below the selected outbound — one page, one flow." data-pt="Melhores retornos aparecem abaixo da ida — uma página, um fluxo.">Best returns appear below the selected outbound — one page, one flow.</span></div>
         </div>
+        <img src="04_Section.png" class="modal-img" loading="lazy" decoding="async" alt="New design — annotated solution screens">
       </div>
 
       <div class="modal-section">
@@ -1349,6 +1386,28 @@ body.dragging #cursor-x    { display: none; }
           <div class="modal-outcome"><div class="modal-outcome-num">-41%</div><div class="modal-outcome-label" data-en="Support tickets per transaction" data-pt="Tickets por transacao">Support tickets per transaction</div></div>
         </div>
         <img src="12_Section.png" class="modal-img" loading="lazy" decoding="async" alt="Outcomes charts H2 2025">
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label" data-en="Reflection" data-pt="Reflexão">Reflection</div>
+        <h2 class="modal-section-title" data-en="Key learnings" data-pt="Principais aprendizados">Key learnings</h2>
+        <div class="ms-highlights">
+          <div class="ms-highlight">
+            <strong data-en="Real users break all assumptions" data-pt="Usuários reais quebram todas as suposições">Real users break all assumptions</strong>
+            <span class="en-only">The inline return flow that looked clean in prototypes confused 4 of 5 participants in testing. Shipping to learn beats over-designing in isolation.</span>
+            <span class="pt-only">O fluxo de retorno inline que parecia limpo nos protótipos confundiu 4 de 5 participantes nos testes. Entregar para aprender supera o over-design em isolamento.</span>
+          </div>
+          <div class="ms-highlight">
+            <strong data-en="Price transparency is a trust signal" data-pt="Transparência de preço é sinal de confiança">Price transparency is a trust signal</strong>
+            <span class="en-only">Showing the round-trip total on the first result card was the single highest-leverage change — it addressed the primary reason users called support instead of completing the booking.</span>
+            <span class="pt-only">Mostrar o total da viagem de ida e volta no primeiro resultado foi a mudança de maior alavancagem — ela endereçou a principal razão pela qual usuários ligavam para o suporte em vez de completar a reserva.</span>
+          </div>
+          <div class="ms-highlight">
+            <strong data-en="Loading states are UX, not afterthoughts" data-pt="Estados de carregamento são UX, não detalhe">Loading states are UX, not afterthoughts</strong>
+            <span class="en-only">A 60-second blank screen was generating support calls. A simple progress bar became one of the most positively commented changes in follow-up sessions — small effort, outsized impact.</span>
+            <span class="pt-only">Uma tela em branco de 60 segundos gerava chamadas de suporte. Uma barra de progresso simples se tornou uma das mudanças mais elogiadas nas sessões de acompanhamento — esforço pequeno, impacto desproporcional.</span>
+          </div>
+        </div>
       </div>
     </div><!-- /case-voll -->
 
