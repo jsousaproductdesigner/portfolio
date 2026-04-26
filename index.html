@@ -1108,7 +1108,7 @@ body.dragging #cursor-x    { display: none; }
   <div class="map-section" id="case1-section" style="left:3800px; top:975px;">
     <div class="panel case-card">
       <div style="height:130px; overflow:hidden; position:relative; border-radius:var(--r-xl) var(--r-xl) 0 0;">
-        <img src="cover.png" alt="VOLL Flights" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+        <img src="cover.png" alt="VOLL Flights" style="width:100%; height:100%; object-fit:cover; object-position:right center;">
         <div style="position:absolute; inset:0; background:linear-gradient(to bottom, rgba(6,12,24,0.15) 0%, var(--parchment) 100%);"></div>
       </div>
       <div class="case-header" style="padding:1.5rem 2.5rem 1.5rem;">
@@ -1306,8 +1306,27 @@ body.dragging #cursor-x    { display: none; }
             <span class="pt-only">Cores excessivas e terminologia técnica que não correspondiam à forma natural de falar sobre voos.</span>
           </div>
         </div>
-        <img src="06_Section.png" class="modal-img" loading="lazy" decoding="async" alt="User pains and business needs data">
-        <img src="07_Section.png" class="modal-img" loading="lazy" decoding="async" alt="User pains and business data">
+        <div class="ms-split" style="margin:1.5rem 0;">
+          <div>
+            <div class="modal-section-label" data-en="User Pains" data-pt="Dores do Usuário">User Pains</div>
+            <h3 style="font-family:var(--font-display);font-size:1.2rem;color:var(--ink);margin-bottom:0.75rem;" data-en="Cognitive overload & dissatisfaction" data-pt="Sobrecarga cognitiva e insatisfação">Cognitive overload & dissatisfaction</h3>
+            <div class="ms-highlights">
+              <div class="ms-highlight"><span class="en-only">Confusion selecting outbound, return, and combined flights — 25% didn't know the difference.</span><span class="pt-only">Confusão ao selecionar ida, volta e combinadas — 25% não sabiam a diferença.</span></div>
+              <div class="ms-highlight"><span class="en-only">Total trip cost unknown until the end of the booking flow — no price transparency.</span><span class="pt-only">Custo total desconhecido até o fim do fluxo — sem transparência de preço.</span></div>
+              <div class="ms-highlight"><span class="en-only">Visual hierarchy overloaded with colors, elements, and inconsistent separators.</span><span class="pt-only">Hierarquia visual sobrecarregada com cores, elementos e separadores inconsistentes.</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="modal-section-label" data-en="Business Needs" data-pt="Necessidades do Negócio">Business Needs</div>
+            <h3 style="font-family:var(--font-display);font-size:1.2rem;color:var(--ink);margin-bottom:0.75rem;" data-en="Cost reduction is key" data-pt="Redução de custo é prioridade">Cost reduction is key</h3>
+            <div class="ms-highlights">
+              <div class="ms-highlight"><span class="en-only">15%+ of users abandoned the platform mid-flow and resorted to offline support — a direct cost to the business.</span><span class="pt-only">15%+ dos usuários abandonavam a plataforma e recorriam ao suporte offline — custo direto ao negócio.</span></div>
+              <div class="ms-highlight"><span class="en-only">Policy clarity gaps: users struggled to correctly apply travel policy rules at booking time.</span><span class="pt-only">Gaps de clareza em políticas: usuários com dificuldade de aplicar regras de política de viagem.</span></div>
+              <div class="ms-highlight"><span class="en-only">Product lagging behind modern flight comparison tools users already knew and trusted.</span><span class="pt-only">Produto atrás das ferramentas modernas de comparação de voos que os usuários já conheciam.</span></div>
+            </div>
+          </div>
+        </div>
+        <img src="07_Section.png" class="modal-img" loading="lazy" decoding="async" alt="Support tickets vs transactions data">
       </div>
 
       <div class="modal-section">
@@ -1356,7 +1375,9 @@ body.dragging #cursor-x    { display: none; }
           <div class="ms-highlight"><strong data-en="Round-trip price from the first result" data-pt="Preço total desde o primeiro resultado">Round-trip price from the first result</strong><span data-en="Full trip cost on every outbound card. No surprises at checkout." data-pt="Custo total em cada resultado. Sem surpresas no checkout.">Full trip cost on every outbound card. No surprises at checkout.</span></div>
           <div class="ms-highlight"><strong data-en="Inline return selection" data-pt="Seleção de retorno inline">Inline return selection</strong><span data-en="Best returns appear below the selected outbound — one page, one flow." data-pt="Melhores retornos aparecem abaixo da ida — uma página, um fluxo.">Best returns appear below the selected outbound — one page, one flow.</span></div>
         </div>
-        <img src="04_Section.png" class="modal-img" loading="lazy" decoding="async" alt="New design — annotated solution screens">
+        <div style="overflow:hidden; border-radius:var(--r-lg); margin:1.5rem 0; border:1px solid rgba(42,31,14,0.1);">
+          <img src="04_Section.png" style="width:100%; display:block; margin-top:-5.5%; border-radius:0;" loading="lazy" decoding="async" alt="New design — annotated solution screens">
+        </div>
       </div>
 
       <div class="modal-section">
@@ -1385,7 +1406,6 @@ body.dragging #cursor-x    { display: none; }
           <div class="modal-outcome"><div class="modal-outcome-num">-82%</div><div class="modal-outcome-label" data-en="Offline bookings (14% to 2.4%)" data-pt="Reservas offline (14% para 2,4%)">Offline bookings (14% to 2.4%)</div></div>
           <div class="modal-outcome"><div class="modal-outcome-num">-41%</div><div class="modal-outcome-label" data-en="Support tickets per transaction" data-pt="Tickets por transacao">Support tickets per transaction</div></div>
         </div>
-        <img src="12_Section.png" class="modal-img" loading="lazy" decoding="async" alt="Outcomes charts H2 2025">
       </div>
 
       <div class="modal-section">
