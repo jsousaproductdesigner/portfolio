@@ -13,16 +13,16 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --navy: #0b1120;
-  --deep: #060c18;
-  --ocean: #0e2040;
-  --water: #162d52;
-  --wave: #1a3660;
+  --navy: #09121e;
+  --deep: #050609;
+  --ocean: #080e1c;
+  --water: #0c1830;
+  --wave: #0f2040;
   --parchment: #f5e6c8;
   --parchment-dark: #e8d4a8;
   --ink: #2a1f0e;
-  --amber: #c97d2a;
-  --amber-light: #e09540;
+  --amber: #d4a450;
+  --amber-light: #f0c044;
   --gold: #f0c060;
   --red: #9b2d20;
   --green-old: #2d5a3d;
@@ -75,7 +75,9 @@ html, body {
   position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
   display: flex; align-items: center; justify-content: space-between;
   padding: 1.5rem 2.5rem;
-  background: linear-gradient(to bottom, rgba(6,12,24,0.92) 70%, transparent);
+  background: linear-gradient(to bottom, rgba(4,5,9,0.97) 60%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .nav-logo {
@@ -153,17 +155,20 @@ html, body {
 #ocean-bg {
   position: fixed; inset: 0;
   background:
+    radial-gradient(ellipse 130% 65% at 50% -8%, rgba(10,22,60,0.7) 0%, transparent 65%),
+    radial-gradient(ellipse 65% 45% at 5% 90%, rgba(6,14,44,0.45) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 92% 15%, rgba(8,16,50,0.3) 0%, transparent 55%),
     repeating-linear-gradient(
       0deg,
       transparent,
       transparent 38px,
-      rgba(255,255,255,0.025) 39px,
+      rgba(255,255,255,0.016) 39px,
       transparent 40px
     ),
     var(--ocean);
   z-index: 0;
   pointer-events: none;
-  animation: ocean-drift 12s linear infinite;
+  animation: ocean-drift 18s linear infinite;
 }
 @keyframes ocean-drift {
   from { background-position: 0 0; }
@@ -836,6 +841,172 @@ body.dragging #cursor-x    { display: none; }
 }
 @keyframes fill-bar { from { width: 0; } to { width: 100%; } }
 
+/* ══════════════════════════════════════════════════
+   DARK PREMIUM REDESIGN — modern override layer
+══════════════════════════════════════════════════ */
+
+/* Glass panels */
+.panel {
+  background: rgba(8,10,22,0.9) !important;
+  border: 1px solid rgba(255,255,255,0.07) !important;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.88), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  color: #eae6dc !important;
+  --ink: #eae6dc;
+  --parchment: #08101e;
+  --parchment-dark: #0e1828;
+  --muted: rgba(234,230,220,0.42);
+  --cream: #eae6dc;
+}
+
+/* Skill & case tags */
+.skill-tag {
+  background: rgba(255,255,255,0.06) !important;
+  border-color: rgba(255,255,255,0.1) !important;
+}
+.case-tag {
+  background: rgba(255,255,255,0.04) !important;
+  border-color: rgba(255,255,255,0.07) !important;
+  color: rgba(234,230,220,0.5) !important;
+}
+
+/* Highlight blocks */
+.ms-highlight { background: rgba(255,255,255,0.03) !important; }
+
+/* Stat blocks */
+.ms-stat {
+  background: rgba(255,255,255,0.03) !important;
+  border-color: rgba(255,255,255,0.06) !important;
+}
+
+/* Delta stat cards — gold accent */
+.ms-stat[style*="--ink"] {
+  background: rgba(212,164,80,0.1) !important;
+  border-color: rgba(212,164,80,0.22) !important;
+  border-top-color: var(--amber-light) !important;
+}
+.ms-stat[style*="--ink"] .ms-stat-label {
+  color: rgba(212,164,80,0.7) !important;
+}
+
+/* Challenge cards */
+.challenge-card {
+  background: rgba(255,255,255,0.03) !important;
+  border-color: rgba(255,255,255,0.07) !important;
+}
+.challenge-card p { color: rgba(234,230,220,0.55) !important; }
+
+/* XP items */
+.xp-item { background: rgba(255,255,255,0.025); padding: 0.75rem 1rem; }
+
+/* Contact links */
+.contact-link { border-color: rgba(255,255,255,0.1) !important; }
+.contact-link:hover {
+  background: rgba(212,164,80,0.1) !important;
+  color: #eae6dc !important;
+  border-color: rgba(212,164,80,0.5) !important;
+  transform: translateX(4px);
+}
+
+/* Case footer */
+.case-footer { border-top-color: rgba(255,255,255,0.06) !important; }
+
+/* Modal — full dark */
+#modal-overlay {
+  background: #060810 !important;
+  --ink: #eae6dc;
+  --parchment: #060810;
+  --parchment-dark: #0c0e1e;
+  --muted: rgba(234,230,220,0.42);
+}
+#modal-content { background: transparent !important; color: #eae6dc !important; }
+.modal-close { color: #eae6dc !important; }
+.modal-meta-row { border-top-color: rgba(255,255,255,0.08) !important; }
+.modal-body { color: rgba(234,230,220,0.78) !important; }
+.modal-outcome {
+  background: rgba(255,255,255,0.03) !important;
+  border-color: rgba(255,255,255,0.06) !important;
+}
+.modal-outcome-label { color: rgba(234,230,220,0.55) !important; }
+.modal-img { border-color: rgba(255,255,255,0.06) !important; }
+
+/* Journey progress */
+#journey-progress {
+  background: rgba(4,5,10,0.88) !important;
+  border-color: rgba(212,164,80,0.18) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+.journey-label { color: rgba(234,230,220,0.4) !important; }
+
+/* Nav arrows */
+.nav-arrow {
+  background: rgba(4,5,10,0.72) !important;
+  border-color: rgba(212,164,80,0.16) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+.nav-arrow:hover {
+  background: rgba(212,164,80,0.12) !important;
+  border-color: rgba(212,164,80,0.5) !important;
+}
+
+/* X mark — golden pulse */
+.x-mark-svg { filter: drop-shadow(0 4px 24px rgba(212,164,80,0.4)) !important; }
+@keyframes pulse-x {
+  0%, 100% { transform: scale(1) rotate(-2deg); filter: drop-shadow(0 4px 20px rgba(212,164,80,0.3)); }
+  50% { transform: scale(1.05) rotate(2deg); filter: drop-shadow(0 8px 32px rgba(212,164,80,0.6)); }
+}
+
+/* Gradient shimmer on hero name */
+.home-title em {
+  background: linear-gradient(135deg, #d4a450 0%, #f0c044 50%, #d4a450 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-gold 4s linear infinite;
+}
+
+/* Nav logo dot shimmer */
+.nav-logo span {
+  background: linear-gradient(90deg, #d4a450, #f0c044, #d4a450);
+  background-size: 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-gold 3s linear infinite;
+}
+@keyframes shimmer-gold {
+  from { background-position: 0% center; }
+  to   { background-position: 200% center; }
+}
+
+/* Noise texture */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  z-index: 9997;
+  pointer-events: none;
+  opacity: 0.018;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+
+/* Edge vignette */
+#viewport::after {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 97;
+  background: radial-gradient(ellipse at 50% 50%, transparent 52%, rgba(3,4,8,0.55) 100%);
+}
+
+/* Loader */
+#loader { background: #050609 !important; }
+.loader-text { letter-spacing: 0.2em !important; }
+
 /* ── Media: mobile ── */
 @media (max-width: 768px) {
   html, body { overflow: auto; }
@@ -909,13 +1080,13 @@ body.dragging #cursor-x    { display: none; }
     <line x1="27" y1="22" x2="27" y2="26" stroke="#3a2010" stroke-width="0.8" stroke-linecap="round" opacity="0.5"/>
   </svg>
   <svg id="cursor-x" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
-    <path d="M5 3 C9 8 18 18 22 22 C26 26 35 36 39 41" stroke="#1a1008" stroke-width="9" stroke-linecap="round" fill="none"/>
-    <path d="M39 3 C35 8 26 18 22 22 C18 26 9 36 5 41" stroke="#1a1008" stroke-width="9" stroke-linecap="round" fill="none"/>
-    <circle cx="5"  cy="3"  r="4.5" fill="#1a1008"/>
-    <circle cx="39" cy="41" r="4"   fill="#1a1008"/>
-    <circle cx="39" cy="3"  r="4.5" fill="#1a1008"/>
-    <circle cx="5"  cy="41" r="4"   fill="#1a1008"/>
-    <circle cx="22" cy="22" r="3.5" fill="#1a1008"/>
+    <path d="M5 3 C9 8 18 18 22 22 C26 26 35 36 39 41" stroke="#d4a450" stroke-width="9" stroke-linecap="round" fill="none"/>
+    <path d="M39 3 C35 8 26 18 22 22 C18 26 9 36 5 41" stroke="#d4a450" stroke-width="9" stroke-linecap="round" fill="none"/>
+    <circle cx="5"  cy="3"  r="4.5" fill="#d4a450"/>
+    <circle cx="39" cy="41" r="4"   fill="#d4a450"/>
+    <circle cx="39" cy="3"  r="4.5" fill="#d4a450"/>
+    <circle cx="5"  cy="41" r="4"   fill="#d4a450"/>
+    <circle cx="22" cy="22" r="3.5" fill="#d4a450"/>
   </svg>
 </div>
 
@@ -1210,13 +1381,13 @@ body.dragging #cursor-x    { display: none; }
   <div class="map-section" id="contact-section" style="left:6800px; top:950px;">
     <div class="panel" id="contact-card">
       <svg class="x-mark-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 8 C18 15 35 35 55 55 C70 70 90 92 108 112" stroke="#1a1008" stroke-width="22" stroke-linecap="round" fill="none"/>
-        <path d="M108 8 C102 15 85 35 65 55 C50 70 30 92 12 112" stroke="#1a1008" stroke-width="22" stroke-linecap="round" fill="none"/>
-        <circle cx="12" cy="8" r="11" fill="#1a1008"/>
-        <circle cx="108" cy="112" r="10" fill="#1a1008"/>
-        <circle cx="108" cy="8" r="11" fill="#1a1008"/>
-        <circle cx="12" cy="112" r="10" fill="#1a1008"/>
-        <circle cx="60" cy="60" r="8" fill="#1a1008"/>
+        <path d="M12 8 C18 15 35 35 55 55 C70 70 90 92 108 112" stroke="#d4a450" stroke-width="22" stroke-linecap="round" fill="none"/>
+        <path d="M108 8 C102 15 85 35 65 55 C50 70 30 92 12 112" stroke="#d4a450" stroke-width="22" stroke-linecap="round" fill="none"/>
+        <circle cx="12" cy="8" r="11" fill="#d4a450"/>
+        <circle cx="108" cy="112" r="10" fill="#d4a450"/>
+        <circle cx="108" cy="8" r="11" fill="#d4a450"/>
+        <circle cx="12" cy="112" r="10" fill="#d4a450"/>
+        <circle cx="60" cy="60" r="8" fill="#d4a450"/>
       </svg>
       <h2 class="contact-title" data-en="You made it. Let's talk?" data-pt="Você chegou. Vamos conversar?">You made it. Let's talk?</h2>
       <p class="contact-sub" data-en="The treasure at the end of every map is a good conversation. Let's find yours." data-pt="O tesouro no fim de todo mapa é uma boa conversa. Vamos encontrar a sua.">
